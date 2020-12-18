@@ -1,0 +1,45 @@
+* {
+  font-family: 'Inter', sans-serif;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+#root {
+  height: 100%;
+}
+
+label {
+  color: $label-color;
+  font-size: .875rem;
+}
+
+label, input, button {
+  display: block;
+}
+
+button, input, textarea {
+  outline: none;
+  border: 0;
+  font-size: 1rem;
+}
+
+input {
+  padding: 1rem .5rem;
+  border-radius: .2rem;
+}
+
+button {
+  cursor: pointer;
+  transition: background-color .32s linear;
+}
+
+button[type="submit"] {
+  font-weight: 500;
+  background-color: $submit-button-bg-color;
+  color: $light-color;
+
+  &:hover {
+    background-color: darken($submit-button-bg-color, 5%);
+  }
+}
