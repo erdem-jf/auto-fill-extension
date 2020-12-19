@@ -1,10 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
+import { MainContext } from '../../store';
 import WizardBox from '../WizardBox';
 import StorageHelper from '../../helpers/storage.helper';
 
 import wizardData from '../../constants/wizardData';
 
 const WizardGeneric = () => {
+  const { state } = useContext(MainContext);
   const [activeUrl, setActiveUrl] = useState('');
   const [inputValue, setInputValue] = useState({
     current: false,
@@ -21,6 +23,7 @@ const WizardGeneric = () => {
   };
 
   const getCount = (item, val) => {
+    console.log('getCount works!', val ? val.length : 0);
     setCountObj(prevState => ({
       ...prevState,
       [item]: val ? val.length : 0
@@ -28,42 +31,79 @@ const WizardGeneric = () => {
   }
 
   const getTabDetails = (tab) => {
-    setActiveUrl(tab.url.split('?')[0].split('//')[1]);
+    setActiveUrl(tab.url.split('?')[0].split('//')[1].split('/')[0]);
   };
 
   const handleToggle = ({ target }) => {
-    setInputValue(target.checked);
+    setInputValue(prevState => {
+      StorageHelper.set({ key: 'toggle', value: {
+        ...prevState,
+        [target.id]: target.checked
+      } })
+      return ({
+        ...prevState,
+        [target.id]: target.checked
+      })
+    });
+  };
+
+  const getToggleData = (val) => {
+    setInputValue(prevState => ({
+      ...prevState,
+      ...val
+    }));
+  }
+
+  const handleCount = () => {
+    wizardData.forEach(item => {
+      StorageHelper.get({ key: item, callback: getCount.bind(this, item) });
+    });
   };
 
   useEffect(() => {
     StorageHelper.getTab(getTabDetails);
+    StorageHelper.get({ key: 'toggle', callback: getToggleData });
 
-    wizardData.forEach(item => {
-      StorageHelper.get({ key: item, callback: getCount.bind(this, item) });
-      console.log('here?');
-    });
+    handleCount();
   }, []);
+
+  useEffect(() => {
+    console.log('state.personal', state.personal);
+    handleCount();
+  }, [state.personal]);
 
   return (
     <div className="jaf-popup-wizard-generic">
       <div className="jaf-popup-wizard-generic-settings">
+        {
+          (state.user && state.user.account_type && state.user.account_type.name && state.user.account_type.name === 'FREE') && (
+            <div className="jaf-popup-wizard-generic-settings-item is-update">
+              <div>
+                <h5>You're <b>{state.user.account_type.name}</b> member.</h5>
+              </div>
+              <button
+                type="button"
+              >Update</button>
+            </div>
+          )
+        }
         <div className="jaf-popup-wizard-generic-settings-item">
           <div>
-            <h5>Disable for this page {activeUrl}</h5>
+            <h5>Disable for {activeUrl}</h5>
           </div>
-            <label htmlFor="current">
-              <input type="checkbox" name="current" id="current" onClick={handleToggle} defaultChecked={inputValue.current} />
-              <span />
-            </label>
+          <label htmlFor="current">
+            <input type="checkbox" name="current" id="current" onChange={handleToggle} checked={inputValue.current} />
+            <span />
+          </label>
         </div>
         <div className="jaf-popup-wizard-generic-settings-item">
           <div>
             <h5>Show JF-AutoFill icon</h5>
           </div>
-            <label htmlFor="show">
-              <input type="checkbox" name="show" id="show" onClick={handleToggle} value={inputValue.show} />
-              <span />
-            </label>
+          <label htmlFor="show">
+            <input type="checkbox" name="show" id="show" onChange={handleToggle} checked={inputValue.show} />
+            <span />
+          </label>
         </div>
       </div>
       <div className="jaf-popup-wizard-generic-boxes">

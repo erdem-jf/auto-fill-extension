@@ -17,6 +17,7 @@
       padding: 1rem;
       margin-top: .5rem;
       background-color: $input-bg-color;
+      font-size: .875rem;
 
       label {
         position: relative;
@@ -56,6 +57,19 @@
               background-color: #8ac185;
             }
           }
+        }
+      }
+
+      &.is-update {
+        position: relative;
+
+        button {
+          position: absolute;
+          right: .5rem;
+          font-size: .875rem;
+          background-color: green;
+          padding: .5rem 1rem;
+          border-radius: .8rem;
         }
       }
     }

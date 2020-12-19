@@ -26,6 +26,7 @@
   }
 
   &.is-new {
+    position: relative;
     padding: 0;
     justify-content: center;
     align-items: center;
@@ -37,6 +38,8 @@
       line-height: 1;
       font-weight: 200;
       color: $label-color;
+      pointer-events: none;
+      transform: translateY(-4px);
     }
   }
 }

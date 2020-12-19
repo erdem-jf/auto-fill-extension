@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { MainContext } from '../../store';
-import { updateWizardScreen } from '../../actions';
+import { updatePersonalData, updateWizardScreen } from '../../actions';
 import StorageHelper from '../../helpers/storage.helper';
 
 const WizardForm = () => {
@@ -20,6 +20,7 @@ const WizardForm = () => {
 
     StorageHelper.save({ type: 'personal', data: [{ bio: value, label }] });
     StorageHelper.set({ key: 'wizard', value: 'generic' });
+    dispatch(updatePersonalData([{ bio: value, label }]));
     dispatch(updateWizardScreen('generic'));
   };
 

@@ -5,6 +5,8 @@ const payload = {
   wizard: {
     screen: 'bio',
   },
+  loading: false,
+  personal: [],
 };
 
 export default payload;

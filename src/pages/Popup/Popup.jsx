@@ -2,7 +2,8 @@ import React, { useContext, useEffect, useState } from 'react';
 import { MainContext } from './store';
 import Login from './components/Login';
 import Wizard from './components/Wizard';
-import { saveUserData, updateWizardScreen } from './actions';
+import LoadingBar from './components/LoadingBar';
+import { saveUserData, setLoading, updateWizardScreen } from './actions';
 import RequestHelper from './helpers/request.helper';
 import StorageHelper from './helpers/storage.helper';
 
@@ -25,12 +26,18 @@ const Popup = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    dispatch(setLoading(true));
     const result = await RequestHelper.login(loginData);
 
-    if (!result.data || result.data.responseCode !== 200) return setErrorModal(true);
+    if (!result.data || result.data.responseCode !== 200) {
+      setErrorModal(true);
+      dispatch(setLoading(false));
+      return;
+    };
 
     StorageHelper.set({ key: 'user', value: result.data.content });
     saveUserDetails(result.data.content);
+    dispatch(setLoading(false));
   }
 
   const saveUserDetails = (user) => {
@@ -38,7 +45,8 @@ const Popup = () => {
   }
 
   const handleWizardScreen = (val) => {
-    dispatch(updateWizardScreen(val || 'bio'));
+    const isBioExist = (val && val.find(item => item.bio)) || false;
+    dispatch(updateWizardScreen(isBioExist ? 'generic' : 'bio'));
   }
 
   const renderScreen = () => {
@@ -55,7 +63,7 @@ const Popup = () => {
 
   useEffect(() => {
     StorageHelper.get({ key: 'user', callback: saveUserDetails });
-    StorageHelper.get({ key: 'wizard', callback: handleWizardScreen });
+    StorageHelper.get({ key: 'personal', callback: handleWizardScreen });
   }, []);
 
   useEffect(() => {
@@ -64,6 +72,7 @@ const Popup = () => {
 
   return (
     <div className="jaf-popup">
+      <LoadingBar />
       { renderScreen() }
     </div>
   );

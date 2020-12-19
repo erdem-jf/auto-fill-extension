@@ -42,6 +42,7 @@
   form {
     display: flex;
     flex-wrap: wrap;
+    margin-top: 4rem;
 
     & > div {
       width: 100%;
@@ -77,7 +78,8 @@
 
   &-footer {
     width: 100%;
-    padding-top: 32px;
+    padding-top: 2rem;
+    margin-top: 2rem;
     border-top: 1px solid #16181d;
 
     & > h4 {

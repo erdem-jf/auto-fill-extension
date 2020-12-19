@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext } from 'react';
 import { MainContext } from '../../store';
 import { removeUserData } from '../../actions';
 import WizardForm from '../WizardForm';
@@ -11,7 +11,7 @@ const Wizard = () => {
   const { dispatch, state } = useContext(MainContext);
 
   const handleLogout = () => {
-    StorageHelper.remove('user');
+    ['user', 'personal', 'wizard', 'toggle'].forEach(key => StorageHelper.remove(key));
     dispatch(removeUserData());
   }
 
@@ -21,12 +21,8 @@ const Wizard = () => {
       generic: () => <WizardGeneric />
     }
 
-    return components[state.wizard.screen]();
+    return components[state.wizard.screen] ? components[state.wizard.screen]() : null;
   };
-
-  useEffect(() => {
-    console.log('Wizard mounted');
-  }, []);
 
   return (
     <div className="jaf-popup-wizard">

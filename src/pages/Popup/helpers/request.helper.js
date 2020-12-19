@@ -24,8 +24,6 @@ function RequestHelper() {
         })
       );
 
-      console.log('response', response);
-
       return response;
     } catch (err) {
       return err;
@@ -33,8 +31,6 @@ function RequestHelper() {
   };
 
   this.getUser = async () => {
-    console.log('this.appKey', this.appKey);
-
     try {
       const response = await axios.get(this.userUrl());
 

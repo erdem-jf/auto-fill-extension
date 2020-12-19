@@ -1,6 +1,8 @@
 import {
   REMOVE_USER_DATA,
   SAVE_USER_DATA,
+  SET_LOADING,
+  UPDATE_PERSONAL_DATA,
   UPDATE_WIZARD_SCEEN,
 } from '../actions/types';
 
@@ -9,6 +11,7 @@ function reducer(state, action) {
     case REMOVE_USER_DATA:
       return {
         ...state,
+        personal: {},
         user: {},
       };
     case SAVE_USER_DATA:
@@ -19,6 +22,11 @@ function reducer(state, action) {
           ...action.value,
         },
       };
+    case UPDATE_PERSONAL_DATA:
+      return {
+        ...state,
+        personal: [...state.personal, ...action.value],
+      };
     case UPDATE_WIZARD_SCEEN:
       return {
         ...state,
@@ -26,6 +34,11 @@ function reducer(state, action) {
           ...state.wizard,
           screen: action.value,
         },
+      };
+    case SET_LOADING:
+      return {
+        ...state,
+        loading: action.value,
       };
     default:
       return state;
