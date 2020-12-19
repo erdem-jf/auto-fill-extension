@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { MainContext } from './store';
 import Login from './components/Login';
 import Wizard from './components/Wizard';
-import { saveUserData } from './actions';
+import { saveUserData, updateWizardScreen } from './actions';
 import RequestHelper from './helpers/request.helper';
 import StorageHelper from './helpers/storage.helper';
 
@@ -37,6 +37,10 @@ const Popup = () => {
     dispatch(saveUserData(user));
   }
 
+  const handleWizardScreen = (val) => {
+    dispatch(updateWizardScreen(val || 'bio'));
+  }
+
   const renderScreen = () => {
     const components = {
       loading: () => <div>Loading...</div>,
@@ -51,10 +55,10 @@ const Popup = () => {
 
   useEffect(() => {
     StorageHelper.get({ key: 'user', callback: saveUserDetails });
+    StorageHelper.get({ key: 'wizard', callback: handleWizardScreen });
   }, []);
 
   useEffect(() => {
-    console.log('state.user', state.user);
     setComponentKey(state.user.appKey ? 'wizard' : 'guest');
   }, [state.user]);
 

@@ -1,0 +1,42 @@
+.jaf-popup-wizard-box {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  flex-direction: column;
+  width: calc(50% - 8px);
+  height: auto;
+  margin-top: 16px;
+  border-radius: .5rem;
+  padding: 1.25rem 1rem;
+
+  h5 {
+    margin-bottom: .5em;
+  }
+
+  h3 {
+    font-size: 2rem;
+  }
+
+  &.is-personal {
+    background-color: #8ac185;
+  }
+
+  &.is-collected {
+    background-color: #7768d8;
+  }
+
+  &.is-new {
+    padding: 0;
+    justify-content: center;
+    align-items: center;
+    background-color: transparent;
+    border: 2px dashed $label-color;
+
+    h3 {
+      font-size: 4rem;
+      line-height: 1;
+      font-weight: 200;
+      color: $label-color;
+    }
+  }
+}

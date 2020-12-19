@@ -27,6 +27,32 @@ function StorageHelper() {
       return err;
     }
   };
+
+  this.handleData = (obj, currentValueInStore) => {
+    const baseData = currentValueInStore || [];
+    const generatedData = [...baseData, ...obj.data];
+
+    this.set({ key: obj.type, value: generatedData });
+  };
+
+  this.save = ({ type = 'other', data = [] }) => {
+    try {
+      this.get({
+        key: type,
+        callback: this.handleData.bind(this, { type, data }),
+      });
+    } catch (err) {
+      console.error('SaveData error', err);
+    }
+  };
+
+  this.getTab = (callback) => {
+    try {
+      chrome.tabs.getSelected(null, callback);
+    } catch (err) {
+      console.error('Err', err);
+    }
+  };
 }
 
 export default new StorageHelper();

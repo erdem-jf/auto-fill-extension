@@ -1,0 +1,59 @@
+.jaf-popup-wizard-form {
+  flex: 1;
+  padding: 2rem;
+
+  form {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    height: 100%;
+
+    & > div {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      width: 100%;
+
+      label {
+        width: 100%;
+        margin-bottom: .5rem;
+      }
+
+      textarea {
+        display: block;
+        border-radius: .5rem;
+        padding: 1rem;
+        font-size: .875rem;
+        flex: 1;
+        resize: none;
+        line-height: 1.8;
+
+        &::-webkit-scrollbar {
+          width: 1em;
+        }
+      
+        &::-webkit-scrollbar-track {
+            -webkit-box-shadow: none;
+            box-shadow: none;
+        }
+        
+        &::-webkit-scrollbar-thumb {
+          background-color: #6b6f7a;
+        }
+      }
+    }
+
+    & > section {
+      display: flex;
+      width: 100%;
+      justify-content: space-between;
+      margin-top: 2rem;
+
+      button {
+        padding: .75rem 1.5rem;
+        font-size: .875rem;
+      }
+    }
+  }
+}

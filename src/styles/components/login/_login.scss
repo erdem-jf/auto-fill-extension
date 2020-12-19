@@ -30,10 +30,6 @@
     }
   }
 
-  &.has-error {
-
-  }
-
   h3 {
     font-weight: 500;
     font-size: 1rem;
@@ -57,10 +53,6 @@
 
       label, input {
         width: 100%;
-      }
-
-      input {
-        background-color: $input-bg-color;
       }
     }
 

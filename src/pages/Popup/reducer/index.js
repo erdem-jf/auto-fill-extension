@@ -1,4 +1,8 @@
-import { REMOVE_USER_DATA, SAVE_USER_DATA } from '../actions/types';
+import {
+  REMOVE_USER_DATA,
+  SAVE_USER_DATA,
+  UPDATE_WIZARD_SCEEN,
+} from '../actions/types';
 
 function reducer(state, action) {
   switch (action.type) {
@@ -13,6 +17,14 @@ function reducer(state, action) {
         user: {
           ...state.user,
           ...action.value,
+        },
+      };
+    case UPDATE_WIZARD_SCEEN:
+      return {
+        ...state,
+        wizard: {
+          ...state.wizard,
+          screen: action.value,
         },
       };
     default:

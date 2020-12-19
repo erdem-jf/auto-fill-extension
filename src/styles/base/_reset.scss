@@ -24,6 +24,11 @@ button, input, textarea {
   font-size: 1rem;
 }
 
+input, textarea {
+  background-color: $input-bg-color;
+  width: 100%;
+}
+
 input {
   padding: 1rem .5rem;
   border-radius: .2rem;
@@ -35,6 +40,7 @@ button {
   color: $light-color;
   cursor: pointer;
   transition: background-color .32s linear;
+  user-select: none;
 
   &:hover {
     background-color: darken($default-button-bg-color, 5%);
