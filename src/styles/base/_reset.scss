@@ -30,8 +30,15 @@ input {
 }
 
 button {
+  border-radius: .25rem;
+  background-color: $default-button-bg-color;
+  color: $light-color;
   cursor: pointer;
   transition: background-color .32s linear;
+
+  &:hover {
+    background-color: darken($default-button-bg-color, 5%);
+  }
 }
 
 button[type="submit"] {

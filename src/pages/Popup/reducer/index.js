@@ -1,8 +1,13 @@
-import { SET_USER_DATA } from '../actions/types';
+import { REMOVE_USER_DATA, SAVE_USER_DATA } from '../actions/types';
 
 function reducer(state, action) {
   switch (action.type) {
-    case SET_USER_DATA:
+    case REMOVE_USER_DATA:
+      return {
+        ...state,
+        user: {},
+      };
+    case SAVE_USER_DATA:
       return {
         ...state,
         user: {

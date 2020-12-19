@@ -1,43 +1,23 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { MainContext } from '../../store';
-import { setUserDetails } from '../../actions';
-import RequestHelper from '../../helpers/request.helper';
+import React from 'react';
+import { bool, func } from 'prop-types';
+import ErrorGif from '../../../../assets/img/error.gif';
 
-const Login = () => {
-  const { dispatch, state } = useContext(MainContext);
-  const [loginData, setLoginData] = useState({ username: '', password: '' });
-
-  const handleInputValue = ({ target: input }) => {
-    setLoginData(prevState => ({
-      ...prevState,
-      [input.name]: input.value
-    }));
-  }
-
-  const writeResponseIntoStore = (result) => {
-    if (result.data.responseCode !== 200) return;
-
-    dispatch(setUserDetails(result.data.content));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const result = await RequestHelper.login(loginData);
-    writeResponseIntoStore(result);
-  }
-
-  const getUserDetails = async () => {
-    const result = await RequestHelper.getUser();
-    writeResponseIntoStore(result);
-  }
-
-  useEffect(() => {
-    getUserDetails();
-  });
-
+const Login = ({ errorModal, handleErrorModal, handleInputValue, handleSubmit }) => {
   return (
     <div className="jaf-popup-login">
       <h3>Login with JotForm account</h3>
+      {
+        errorModal && (
+          <div className="jaf-popup-login-error">
+            <img src={ErrorGif} alt="error-gif" />
+            <p>Sorry! Username or password is wrong.</p>
+            <button
+              type="button"
+              onClick={handleErrorModal}
+            >Back</button>
+          </div>
+        )
+      }
       <form onSubmit={handleSubmit}>
         <div>
           <label htmlFor="username">Username</label>
@@ -67,7 +47,21 @@ const Login = () => {
         <a href="https://www.jotform.com/" target="_blank" rel="noreferrer">Create an account</a>
       </div>
     </div>
-  )
+  );
+};
+
+Login.propTypes = {
+  errorModal: bool,
+  handleErrorModal: func,
+  handleInputValue: func,
+  handleSubmit: func
+}
+
+Login.defaultProps = {
+  errorModal: false,
+  handleErrorModal: f => f,
+  handleInputValue: f => f,
+  handleSubmit: f => f
 }
 
 export default Login;

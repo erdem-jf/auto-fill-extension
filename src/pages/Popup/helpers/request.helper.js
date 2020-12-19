@@ -2,15 +2,29 @@ import axios from 'axios';
 import querystring from 'querystring';
 
 function RequestHelper() {
+  this.appKey = '';
   this.loginUrl = 'https://erdem.jotform.pro/API/user/login';
-  this.userUrl = 'https://erdem.jotform.pro/API/user';
+  this.logoutUrl = 'https://erdem.jotform.pro/API/user/logout';
+  this.userUrl = () =>
+    'https://erdem.jotform.pro/API/user?apiKey=1142c521c02ec0c35fa79bc469a9d2b8';
+
+  this.saveAppKey = (key) => {
+    this.appKey = key;
+  };
 
   this.login = async ({ username, password }) => {
     try {
-      const response = axios.post(
+      const response = await axios.post(
         this.loginUrl,
-        querystring.stringify({ username, password })
+        querystring.stringify({
+          username,
+          password,
+          appName: 'localhost',
+          access: 'readOnly',
+        })
       );
+
+      console.log('response', response);
 
       return response;
     } catch (err) {
@@ -19,8 +33,10 @@ function RequestHelper() {
   };
 
   this.getUser = async () => {
+    console.log('this.appKey', this.appKey);
+
     try {
-      const response = await axios.get('https://erdem.jotform.pro/API/user');
+      const response = await axios.get(this.userUrl());
 
       return response;
     } catch (err) {

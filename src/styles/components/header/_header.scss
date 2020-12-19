@@ -1,0 +1,62 @@
+.jaf-popup-header {
+  padding: 32px 32px 0 32px;
+
+  &-profile {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+
+    & > span {
+      display: block;
+      width: 4rem;
+      height: 4rem;
+      border-radius: 50%;
+      object-fit: cover;
+      overflow: hidden;
+
+      img {
+        width: 100%;
+        height: 100%;
+      }
+    }
+
+    & > div {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      margin-left: 1rem;
+
+      h4 {
+        text-transform: uppercase;
+      }
+
+      p {
+        font-size: .75rem;
+        margin-top: .25em;
+        color: $label-color;
+      }
+    }
+
+    & > button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 2rem;
+      height: 2rem;
+      margin-left: auto;
+      border-radius: 50%;
+      background-color: #16181d;
+
+      svg {
+        display: block;
+        width: 24px;
+        height: 24px;
+        transform: translateY(2px);
+
+        polygon {
+          fill: #fff;
+        }
+      }
+    }
+  }
+}

@@ -1,9 +1,7 @@
 // initial payload
 const payload = {
-  key: '',
-  user: {
-    username: 'guest',
-  },
+  appKey: '',
+  user: {},
 };
 
 export default payload;
