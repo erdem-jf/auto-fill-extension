@@ -7,6 +7,8 @@ const payload = {
   },
   loading: false,
   personal: [],
+  collected: [],
+  forms: [],
 };
 
 export default payload;

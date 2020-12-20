@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { MainContext } from '../../store';
-import { updateWizardScreen } from '../../actions';
+import { updateCollectedData, updatePersonalData, updateWizardScreen } from '../../actions';
 import WizardBox from '../WizardBox';
 import StorageHelper from '../../helpers/storage.helper';
 
@@ -13,11 +13,6 @@ const WizardGeneric = () => {
     current: false,
     show: false
   });
-  const [countObj, setCountObj] = useState({
-    personal: 0,
-    collected: 0,
-    forms: 0
-  });
 
   const handleNewButtonClick = () => {
     dispatch(updateWizardScreen('new'))
@@ -28,16 +23,17 @@ const WizardGeneric = () => {
       new: handleNewButtonClick
     };
 
-    console.log('type', type);
     if (funcs[type]) return funcs[type]();
   };
 
-  const getCount = (item, val) => {
-    setCountObj(prevState => ({
-      ...prevState,
-      [item]: val ? val.length : 0
-    }));
-  }
+  // const getCount = (item, val) => {
+  //   const func = {
+  //     personal: () => dispatch(updatePersonalData(val)),
+  //     collected: () => dispatch(updateCollectedData(val)),
+  //   };
+
+  //   if (func[item]) func[item]();
+  // }
 
   const getTabDetails = (tab) => {
     setActiveUrl(tab.url.split('?')[0].split('//')[1].split('/')[0]);
@@ -63,23 +59,22 @@ const WizardGeneric = () => {
     }));
   }
 
-  const handleCount = () => {
-    wizardData.forEach(item => {
-      StorageHelper.get({ key: item, callback: getCount.bind(this, item) });
-    });
-  };
+  // const getCountData = (val) => {
+  //   console.log(val.length);
+  // };
+
+  // const handleCount = () => {
+  //   wizardData.forEach(item => {
+  //     StorageHelper.get({ key: item, callback: getCount.bind(this, item) });
+  //   });
+  // };
 
   useEffect(() => {
     StorageHelper.getTab(getTabDetails);
     StorageHelper.get({ key: 'toggle', callback: getToggleData });
 
-    handleCount();
+    // handleCount();
   }, []);
-
-  useEffect(() => {
-    console.log('state.personal', state.personal);
-    handleCount();
-  }, [state.personal]);
 
   return (
     <div className="jaf-popup-wizard-generic">
@@ -124,7 +119,7 @@ const WizardGeneric = () => {
                 className={`jaf-popup-wizard-box is-${item}`}
                 onClick={onWizardBoxClick.bind(this, item)}
                 type={item}
-                count={countObj[item] || 0}
+                count={(state[item] && state[item].length && state[item].length) || 0}
               />
             )
           })

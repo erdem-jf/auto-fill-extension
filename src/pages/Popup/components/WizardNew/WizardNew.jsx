@@ -1,13 +1,14 @@
 import React, {  useContext, useState } from 'react';
 import { MainContext } from '../../store';
-import { updateWizardScreen } from '../../actions';
+import StorageHelper from '../../helpers/storage.helper';
+import { setLoading, updateCollectedData ,updateWizardScreen } from '../../actions';
 
 const WizardNew = () => {
-  const { dispatch } = useContext(MainContext);
+  const { dispatch, state } = useContext(MainContext);
   const [formData, setFormData] = useState([
     {
       question: 'What is the name of your first pet?',
-      answer: 'Joe',
+      answer: 'Zeytin',
       id: 'collected'
     }
   ]);
@@ -39,8 +40,6 @@ const WizardNew = () => {
   };
 
   const handleInputOnChange = (index, type, { target }) => {
-    console.log('target.value', target.value);
-
     const newFormData = formData.reduce((payload, item, i) => {
       const arr = payload;
 
@@ -53,9 +52,22 @@ const WizardNew = () => {
     setFormData(newFormData);
   };
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    dispatch(setLoading(true));
+
+    formData.forEach((item) => {
+      StorageHelper.save({ type: item.id || 'collected', data: [ item ] });
+      dispatch(updateCollectedData([ item ]));
+    });
+
+    dispatch(setLoading(false));
+    dispatch(updateWizardScreen('generic'));
+  };
+
   return (
     <div className="jaf-popup-wizard-new">
-      <form>
+      <form onSubmit={handleSubmit}>
         {
           formData.map((item, index) => {
             return (
@@ -80,7 +92,7 @@ const WizardNew = () => {
           <button type="button" onClick={handleAddNewQuery}>
             + Card
           </button>
-          <button type="submit">
+          <button type="submit" disabled={state.loading}>
             Save
           </button>
         </section>

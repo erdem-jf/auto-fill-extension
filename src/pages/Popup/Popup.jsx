@@ -3,9 +3,11 @@ import { MainContext } from './store';
 import Login from './components/Login';
 import Wizard from './components/Wizard';
 import LoadingBar from './components/LoadingBar';
-import { saveUserData, setLoading, updateWizardScreen } from './actions';
+import { saveUserData, setLoading, updateCollectedData, updatePersonalData, updateWizardScreen } from './actions';
 import RequestHelper from './helpers/request.helper';
 import StorageHelper from './helpers/storage.helper';
+
+import wizardData from './constants/wizardData';
 
 const Popup = () => {
   const { dispatch, state } = useContext(MainContext);
@@ -49,6 +51,21 @@ const Popup = () => {
     dispatch(updateWizardScreen(isBioExist ? 'generic' : 'bio'));
   }
 
+  const getCount = (item, val) => {
+    const func = {
+      personal: () => dispatch(updatePersonalData(val)),
+      collected: () => dispatch(updateCollectedData(val)),
+    };
+
+    if (func[item]) func[item]();
+  }
+
+  const handleCount = () => {
+    wizardData.forEach(item => {
+      StorageHelper.get({ key: item, callback: getCount.bind(this, item) });
+    });
+  };
+
   const renderScreen = () => {
     const components = {
       loading: () => <div>Loading...</div>,
@@ -64,6 +81,8 @@ const Popup = () => {
   useEffect(() => {
     StorageHelper.get({ key: 'user', callback: saveUserDetails });
     StorageHelper.get({ key: 'personal', callback: handleWizardScreen });
+
+    handleCount();
   }, []);
 
   useEffect(() => {

@@ -2,6 +2,7 @@ import {
   REMOVE_USER_DATA,
   SAVE_USER_DATA,
   SET_LOADING,
+  UPDATE_COLLECTED_DATA,
   UPDATE_PERSONAL_DATA,
   UPDATE_WIZARD_SCEEN,
 } from '../actions/types';
@@ -21,6 +22,11 @@ function reducer(state, action) {
           ...state.user,
           ...action.value,
         },
+      };
+    case UPDATE_COLLECTED_DATA:
+      return {
+        ...state,
+        collected: [...state.collected, ...action.value],
       };
     case UPDATE_PERSONAL_DATA:
       return {
