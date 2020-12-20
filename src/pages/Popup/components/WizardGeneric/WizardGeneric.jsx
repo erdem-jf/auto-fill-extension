@@ -1,12 +1,13 @@
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { MainContext } from '../../store';
+import { updateWizardScreen } from '../../actions';
 import WizardBox from '../WizardBox';
 import StorageHelper from '../../helpers/storage.helper';
 
 import wizardData from '../../constants/wizardData';
 
 const WizardGeneric = () => {
-  const { state } = useContext(MainContext);
+  const { dispatch, state } = useContext(MainContext);
   const [activeUrl, setActiveUrl] = useState('');
   const [inputValue, setInputValue] = useState({
     current: false,
@@ -18,12 +19,20 @@ const WizardGeneric = () => {
     forms: 0
   });
 
+  const handleNewButtonClick = () => {
+    dispatch(updateWizardScreen('new'))
+  };
+
   const onWizardBoxClick = (type) => {
+    const funcs = {
+      new: handleNewButtonClick
+    };
+
     console.log('type', type);
+    if (funcs[type]) return funcs[type]();
   };
 
   const getCount = (item, val) => {
-    console.log('getCount works!', val ? val.length : 0);
     setCountObj(prevState => ({
       ...prevState,
       [item]: val ? val.length : 0

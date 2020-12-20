@@ -1,0 +1,88 @@
+.jaf-popup-wizard-new {
+  position: relative;
+  padding: 2rem;
+
+  & > button {
+    background-color: transparent;
+    padding: .5rem 1rem .5rem 0;
+    color: $label-color;
+    margin-bottom: 1rem;
+  }
+
+  form {
+    & > div {
+      background-color: black;
+      padding: 1rem;
+      border-radius: .25rem;
+
+      &:not(:first-child) {
+        margin-top: 2rem;
+      }
+
+      h4 {
+        font-size: .875rem;;
+        font-weight: 400;
+        margin-bottom: .5rem;
+        color: $label-color;
+
+        &:first-of-type {
+          display: flex;
+          justify-content: space-between;
+
+          button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 1rem;
+            height: 1rem;
+            font-size: .875rem;
+            border-radius: 50%;
+            background-color: #ffabc8;
+            color: $dark-color;
+            line-height: 1;
+          }
+        }
+
+        &:not(:first-of-type) {
+          margin-top: 1rem;
+        }
+
+        textarea {
+          padding: 2re,;
+        }
+      }
+    }
+
+    & > section {
+      position: relative;
+      z-index: 3;
+      display: flex;
+      margin-top: 2rem;
+
+      button {
+        padding: 1rem 1.5rem;
+
+        &:nth-child(2) {
+          background-color: $label-color;
+          color: $dark-color;
+          margin-left: .5rem;
+        }
+
+        &:last-child {
+          margin-left: auto;
+        }
+      }
+    }
+  }
+
+  &-overlay {
+    position: fixed;
+    z-index: 2;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 10rem;
+    background: linear-gradient(0deg, rgba(34,36,44,1) 0%, rgba(34,36,44,0.15728298155199583) 100%);
+    pointer-events: none;
+  }
+}

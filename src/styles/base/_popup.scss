@@ -7,6 +7,10 @@ body {
   height: auto;
   font-size: 16px;
   color: $light-color;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 .jaf-popup {
