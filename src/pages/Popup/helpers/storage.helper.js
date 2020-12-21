@@ -53,10 +53,6 @@ function StorageHelper() {
       console.error('Err', err);
     }
   };
-
-  this.sendMessage = ({ type, callback }) => {
-    chrome.runtime.sendMessage({ type }, callback);
-  };
 }
 
 export default new StorageHelper();

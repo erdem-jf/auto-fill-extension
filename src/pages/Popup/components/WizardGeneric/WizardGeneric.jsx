@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { MainContext } from '../../store';
-import { updateWizardScreen } from '../../actions';
+import { updateWizardScreen, saveSettings } from '../../actions';
 import WizardBox from '../WizardBox';
 import StorageHelper from '../../helpers/storage.helper';
 
@@ -11,7 +11,7 @@ const WizardGeneric = () => {
   const [activeUrl, setActiveUrl] = useState('');
   const [inputValue, setInputValue] = useState({
     current: false,
-    show: true
+    show: false
   });
 
   const handlePersonalClick = () => {
@@ -35,17 +35,16 @@ const WizardGeneric = () => {
     setActiveUrl(tab.url.split('?')[0].split('//')[1].split('/')[0]);
   };
 
-  const handleToggle = ({ target }) => {
-    setInputValue(prevState => {
-      StorageHelper.set({ key: 'toggle', value: {
-        ...prevState,
-        [target.id]: target.checked
-      } })
-      return ({
-        ...prevState,
-        [target.id]: target.checked
-      })
-    });
+  const handleDisableForThisSite = ({ target }) => {
+    console.log('handleDisableForThisSite', handleDisableForThisSite);
+  };
+
+  const handleShowIcon = ({ target }) => {
+    const newSettings = {
+      [target.name]: target.checked
+    };
+
+    dispatch(saveSettings(newSettings));
   };
 
   const getToggleData = (val) => {
@@ -71,7 +70,7 @@ const WizardGeneric = () => {
               </div>
               <button
                 type="button"
-              >Update</button>
+              >UPDATE</button>
             </div>
           )
         }
@@ -80,7 +79,7 @@ const WizardGeneric = () => {
             <h5>Disable for {activeUrl}</h5>
           </div>
           <label htmlFor="current">
-            <input type="checkbox" name="current" id="current" onChange={handleToggle} checked={inputValue.current} />
+            <input type="checkbox" name="current" id="current" onChange={handleDisableForThisSite} checked={inputValue.current} />
             <span />
           </label>
         </div>
@@ -88,8 +87,8 @@ const WizardGeneric = () => {
           <div>
             <h5>Show JF-AutoFill icon</h5>
           </div>
-          <label htmlFor="show">
-            <input type="checkbox" name="show" id="show" onChange={handleToggle} checked={inputValue.show} />
+          <label htmlFor="showIcon">
+            <input type="checkbox" name="showIcon" id="showIcon" onChange={handleShowIcon} checked={state.settings.showIcon} />
             <span />
           </label>
         </div>

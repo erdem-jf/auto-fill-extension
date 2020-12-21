@@ -3,7 +3,7 @@ import { MainContext } from './store';
 import Login from './components/Login';
 import Wizard from './components/Wizard';
 import LoadingBar from './components/LoadingBar';
-import { saveUserData, setLoading, updateCollectedData, updatePersonalData, updateWizardScreen } from './actions';
+import { saveUserData, saveSettings, setLoading, updateCollectedData, updatePersonalData, updateWizardScreen } from './actions';
 import RequestHelper from './helpers/request.helper';
 import StorageHelper from './helpers/storage.helper';
 
@@ -46,9 +46,13 @@ const Popup = () => {
     dispatch(saveUserData(user));
   }
 
-  const handleWizardScreen = (val) => {
+  const saveWizardDetails = (val) => {
     const isBioExist = (val && val.find(item => item.question === 'bio')) || false;
     dispatch(updateWizardScreen(isBioExist ? 'generic' : 'bio'));
+  }
+
+  const saveSettingsDetails = (settings) => {
+    dispatch(saveSettings(settings));
   }
 
   const getCount = (item, val) => {
@@ -81,8 +85,13 @@ const Popup = () => {
   };
 
   useEffect(() => {
-    StorageHelper.get({ key: 'user', callback: saveUserDetails });
-    StorageHelper.get({ key: 'personal', callback: handleWizardScreen });
+    const funcs = {
+      user: saveUserDetails,
+      personal: saveWizardDetails,
+      settings: saveSettingsDetails
+    };
+
+    ['user', 'personal', 'settings'].forEach((key) => StorageHelper.get({ key, callback: funcs[key] }));
 
     handleCount();
   }, []);
@@ -90,6 +99,11 @@ const Popup = () => {
   useEffect(() => {
     setComponentKey(state.user.appKey ? 'wizard' : 'guest');
   }, [state.user]);
+
+  useEffect(() => {
+    console.log('settings updated', state.settings);
+    StorageHelper.set({ key: 'settings', value: state.settings });
+  }, [state.settings]);
 
   return (
     <div className="jaf-popup">

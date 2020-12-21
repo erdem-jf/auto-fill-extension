@@ -2,6 +2,7 @@ import {
   REMOVE_USER_DATA,
   SAVE_USER_DATA,
   SET_LOADING,
+  SAVE_SETTINGS,
   UPDATE_COLLECTED_DATA,
   UPDATE_PERSONAL_DATA,
   UPDATE_WIZARD_SCEEN,
@@ -12,13 +13,14 @@ function reducer(state, action) {
     case REMOVE_USER_DATA:
       return {
         ...state,
-        personal: {},
+        personal: [],
         user: {},
-        collected: {},
+        collected: [],
         wizard: {
           screen: 'bio',
         },
-        forms: {},
+        forms: [],
+        settings: {},
       };
     case SAVE_USER_DATA:
       return {
@@ -29,15 +31,16 @@ function reducer(state, action) {
         },
       };
     case UPDATE_COLLECTED_DATA:
+      const newCollectedData = [...state.collected, ...action.value];
+      //
       return {
         ...state,
-        collected: [...(state.collected || []), ...action.value],
+        collected: newCollectedData,
       };
     case UPDATE_PERSONAL_DATA:
-      console.log([...(state.personal || []), ...action.value]);
       return {
         ...state,
-        personal: [...(state.personal || []), ...action.value],
+        personal: [...state.personal, ...action.value],
       };
     case UPDATE_WIZARD_SCEEN:
       return {
@@ -51,6 +54,14 @@ function reducer(state, action) {
       return {
         ...state,
         loading: action.value,
+      };
+    case SAVE_SETTINGS:
+      return {
+        ...state,
+        settings: {
+          ...(state.settings || {}),
+          ...action.value,
+        },
       };
     default:
       return state;

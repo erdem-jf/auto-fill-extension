@@ -20,6 +20,7 @@ const WizardForm = () => {
 
     StorageHelper.save({ type: 'personal', data: [{ answer: value, question: 'bio', type: 'personal' }] });
     StorageHelper.set({ key: 'wizard', value: 'generic' });
+
     dispatch(updatePersonalData([{ answer: value, question: 'bio', type: 'personal' }]));
     dispatch(updateWizardScreen('generic'));
   };

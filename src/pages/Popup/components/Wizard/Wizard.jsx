@@ -13,7 +13,7 @@ const Wizard = () => {
   const { dispatch, state } = useContext(MainContext);
 
   const handleLogout = () => {
-    ['user', 'personal', 'collected', 'wizard', 'toggle'].forEach(key => StorageHelper.remove(key));
+    ['user', 'personal', 'collected', 'wizard', 'toggle', 'settings'].forEach(key => StorageHelper.remove(key));
     dispatch(removeUserData());
   }
 

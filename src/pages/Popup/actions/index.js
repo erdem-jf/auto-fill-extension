@@ -2,6 +2,7 @@ import {
   REMOVE_USER_DATA,
   SAVE_USER_DATA,
   SET_LOADING,
+  SAVE_SETTINGS,
   UPDATE_COLLECTED_DATA,
   UPDATE_PERSONAL_DATA,
   UPDATE_WIZARD_SCEEN,
@@ -20,5 +21,9 @@ export const updateCollectedData = (value) => ({
 });
 export const updateWizardScreen = (value) => ({
   type: UPDATE_WIZARD_SCEEN,
+  value,
+});
+export const saveSettings = (value) => ({
+  type: SAVE_SETTINGS,
   value,
 });

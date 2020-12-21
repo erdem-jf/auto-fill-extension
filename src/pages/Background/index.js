@@ -37,19 +37,19 @@ class Background {
       // context: 'Q: Who discovered the America?',
       stream: false,
       stop: '/n',
-      length: 124,
+      length: 200,
       best_of: 1,
       completions: 1,
       frequency_penalty: 0,
       presence_penalty: 0,
-      temperature: 0.2,
+      temperature: 0.4,
       top_p: 1,
       ...params,
     };
 
-    console.log(options);
-
     const result = await RequestHelper.generate(options);
+
+    console.log('result', result);
 
     return result;
   }
