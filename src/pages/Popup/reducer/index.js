@@ -31,12 +31,13 @@ function reducer(state, action) {
     case UPDATE_COLLECTED_DATA:
       return {
         ...state,
-        collected: [...state.collected, ...action.value],
+        collected: [...(state.collected || []), ...action.value],
       };
     case UPDATE_PERSONAL_DATA:
+      console.log([...(state.personal || []), ...action.value]);
       return {
         ...state,
-        personal: [...state.personal, ...action.value],
+        personal: [...(state.personal || []), ...action.value],
       };
     case UPDATE_WIZARD_SCEEN:
       return {

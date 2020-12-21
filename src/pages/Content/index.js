@@ -41,7 +41,15 @@ class Content {
     }
   }
 
-  async handleButtonClick({ input, label }) {
+  async handleButtonClick({ input, label }, { target: buttonEl }) {
+    buttonEl.disabled = true;
+    buttonEl.classList.add('has-loading');
+
+    const removeLoadingFromCurrentButton = () => {
+      buttonEl.disabled = false;
+      buttonEl.classList.remove('has-loading');
+    };
+
     try {
       chrome.runtime.sendMessage(
         { type: 'CATEGORIZE_DATA', query: label.innerText },
@@ -70,7 +78,8 @@ class Content {
               },
               (response) => {
                 const answer = response.data.data.choices[0].text;
-                input.setAttribute('value', answer);
+                input.setAttribute('value', answer.split('A:')[1]);
+                removeLoadingFromCurrentButton();
               }
             );
           }
@@ -92,12 +101,14 @@ class Content {
 
                 const answer = textArr[textArr.length - 1];
                 input.setAttribute('value', answer);
+                removeLoadingFromCurrentButton();
               }
             );
           }
         }
       );
     } catch (err) {
+      removeLoadingFromCurrentButton();
       console.error(err);
     }
   }
@@ -110,6 +121,11 @@ class Content {
         src="https://www.jotform.com/wepay/assets/img/podo.png?v=1.0.0.0"
         alt="podo-logo-jf-auto-fill-extension"
       />
+      <div class="jaf-extension-button-loader">
+        <div class="jaf-extension-button-loader__blob"></div>
+        <div class="jaf-extension-button-loader__blob"></div>
+        <div class="jaf-extension-button-loader__blob"></div>
+      </div>
     `;
     button.addEventListener(
       'click',
