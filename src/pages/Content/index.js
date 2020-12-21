@@ -4,6 +4,7 @@ import StorageHelper from '../Popup/helpers/storage.helper';
 class Content {
   constructor() {
     this.inputs = document.querySelectorAll('form input:not([type="hidden"])');
+    console.log(document.querySelectorAll('input:not([type="hidden"])'));
 
     this.handleButtonClick = this.handleButtonClick.bind(this);
     this.connectAndSyncWithStorage = this.connectAndSyncWithStorage.bind(this);
@@ -192,4 +193,7 @@ class Content {
   }
 }
 
-new Content().init();
+window.onload = () => {
+  console.log('page loaded');
+  new Content().init();
+};
