@@ -6,6 +6,7 @@ import {
   UPDATE_COLLECTED_DATA,
   UPDATE_PERSONAL_DATA,
   UPDATE_WIZARD_SCEEN,
+  UPDATE_DISABLED_LIST,
 } from '../actions/types';
 
 function reducer(state, action) {
@@ -21,6 +22,7 @@ function reducer(state, action) {
         },
         forms: [],
         settings: {},
+        disabledList: [],
       };
     case SAVE_USER_DATA:
       return {
@@ -62,6 +64,11 @@ function reducer(state, action) {
           ...(state.settings || {}),
           ...action.value,
         },
+      };
+    case UPDATE_DISABLED_LIST:
+      return {
+        ...state,
+        disabledList: action.value,
       };
     default:
       return state;

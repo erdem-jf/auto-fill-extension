@@ -6,6 +6,7 @@ import {
   UPDATE_COLLECTED_DATA,
   UPDATE_PERSONAL_DATA,
   UPDATE_WIZARD_SCEEN,
+  UPDATE_DISABLED_LIST,
 } from './types';
 
 export const removeUserData = () => ({ type: REMOVE_USER_DATA });
@@ -25,5 +26,9 @@ export const updateWizardScreen = (value) => ({
 });
 export const saveSettings = (value) => ({
   type: SAVE_SETTINGS,
+  value,
+});
+export const updateDisabledList = (value) => ({
+  type: UPDATE_DISABLED_LIST,
   value,
 });

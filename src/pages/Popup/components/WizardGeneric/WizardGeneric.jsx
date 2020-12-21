@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { MainContext } from '../../store';
-import { updateWizardScreen, saveSettings } from '../../actions';
+import { updateWizardScreen, saveSettings, updateDisabledList } from '../../actions';
 import WizardBox from '../WizardBox';
 import StorageHelper from '../../helpers/storage.helper';
 
@@ -8,11 +8,9 @@ import wizardData from '../../constants/wizardData';
 
 const WizardGeneric = () => {
   const { dispatch, state } = useContext(MainContext);
-  const [activeUrl, setActiveUrl] = useState('');
-  const [inputValue, setInputValue] = useState({
-    current: false,
-    show: false
-  });
+  // const [activeUrl, setActiveUrl] = useState('');
+  const [url, setUrl] = useState('');
+  const [disabledInputValue, setDisabledInputValue] = useState(false);
 
   const handlePersonalClick = () => {
     dispatch(updateWizardScreen('personal'))
@@ -32,11 +30,47 @@ const WizardGeneric = () => {
   };
 
   const getTabDetails = (tab) => {
-    setActiveUrl(tab.url.split('?')[0].split('//')[1].split('/')[0]);
+    setUrl(tab.url);
+    // setActiveUrl(tab.url.split('?')[0].split('//')[1].split('/')[0]);
   };
 
-  const handleDisableForThisSite = ({ target }) => {
-    console.log('handleDisableForThisSite', handleDisableForThisSite);
+  const getDisabledList = (disabledList) => {
+    if (disabledList.length > 0) {
+      disabledList.forEach(item => {
+        console.log(url);
+        console.log(item);
+        if (item.url === url) {
+          setDisabledInputValue(item.status);
+        }
+      })
+    }
+
+    dispatch(updateDisabledList(disabledList));
+  };
+
+  const handleDisableForThisSite = ({ target: { checked } }) => {
+    console.log('state.disabledList', state.disabledList);
+    let targetIndex;
+    const itemIsExist = state.disabledList.find((item, index) => {
+      targetIndex = index;
+      return item.url === url;
+    });
+    console.log('itemIsExist', itemIsExist);
+    
+    const newDisabledList = [...state.disabledList];
+    if (itemIsExist) {
+      newDisabledList[targetIndex].status = checked;
+    } else {
+      newDisabledList.push({
+        url,
+        status: checked
+      })
+    }
+
+    dispatch(updateDisabledList(newDisabledList));
+    StorageHelper.set({ key: 'disabledList', value: newDisabledList });
+
+    setDisabledInputValue(checked);
   };
 
   const handleShowIcon = ({ target }) => {
@@ -47,17 +81,13 @@ const WizardGeneric = () => {
     dispatch(saveSettings(newSettings));
   };
 
-  const getToggleData = (val) => {
-    setInputValue(prevState => ({
-      ...prevState,
-      ...val
-    }));
-  }
-
   useEffect(() => {
     StorageHelper.getTab(getTabDetails);
-    StorageHelper.get({ key: 'toggle', callback: getToggleData });
   }, []);
+
+  useEffect(() => {
+    StorageHelper.get({ key: 'disabledList', callback: getDisabledList });
+  }, [url]);
 
   return (
     <div className="jaf-popup-wizard-generic">
@@ -76,10 +106,10 @@ const WizardGeneric = () => {
         }
         <div className="jaf-popup-wizard-generic-settings-item">
           <div>
-            <h5>Disable for {activeUrl}</h5>
+            <h5>Disable for this site</h5>
           </div>
           <label htmlFor="current">
-            <input type="checkbox" name="current" id="current" onChange={handleDisableForThisSite} checked={inputValue.current} />
+            <input type="checkbox" name="current" id="current" onChange={handleDisableForThisSite} checked={disabledInputValue} />
             <span />
           </label>
         </div>
