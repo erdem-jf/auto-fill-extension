@@ -1,0 +1,32 @@
+.jaf-extension-button {
+  position: fixed;
+  z-index: 999999;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  transform: translateX(-100%) translateY(-50%);
+  border-radius: 50%;
+  border: 1px solid #c1c1c1;
+  background-color: #fff;
+  cursor: pointer;
+  transition: border-color .32s linear;
+}
+
+.jaf-extension-button img {
+  display: block;
+  width: 24px;
+  height: auto;
+  pointer-events: none;
+  transform-origin: center;
+  transition: all .32s linear;
+}
+
+.jaf-extension-button:hover {
+  border-color: orange;
+}
+
+.jaf-extension-button:hover img {
+  transform: scale(1.32);
+}

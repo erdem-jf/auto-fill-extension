@@ -18,9 +18,9 @@ const WizardForm = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    StorageHelper.save({ type: 'personal', data: [{ bio: value, label }] });
+    StorageHelper.save({ type: 'personal', data: [{ answer: value, question: 'bio', type: 'personal' }] });
     StorageHelper.set({ key: 'wizard', value: 'generic' });
-    dispatch(updatePersonalData([{ bio: value, label }]));
+    dispatch(updatePersonalData([{ answer: value, question: 'bio', type: 'personal' }]));
     dispatch(updateWizardScreen('generic'));
   };
 

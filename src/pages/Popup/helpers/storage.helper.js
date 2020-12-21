@@ -36,8 +36,6 @@ function StorageHelper() {
   };
 
   this.save = ({ type = 'collected', data = [] }) => {
-    console.log('type', type);
-    console.log('data', data);
     try {
       this.get({
         key: type,
@@ -54,6 +52,10 @@ function StorageHelper() {
     } catch (err) {
       console.error('Err', err);
     }
+  };
+
+  this.sendMessage = ({ type, callback }) => {
+    chrome.runtime.sendMessage({ type }, callback);
   };
 }
 

@@ -14,6 +14,11 @@ function reducer(state, action) {
         ...state,
         personal: {},
         user: {},
+        collected: {},
+        wizard: {
+          screen: 'bio',
+        },
+        forms: {},
       };
     case SAVE_USER_DATA:
       return {

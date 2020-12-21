@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { MainContext } from '../../store';
-import { updateCollectedData, updatePersonalData, updateWizardScreen } from '../../actions';
+import { updateWizardScreen } from '../../actions';
 import WizardBox from '../WizardBox';
 import StorageHelper from '../../helpers/storage.helper';
 
@@ -11,8 +11,12 @@ const WizardGeneric = () => {
   const [activeUrl, setActiveUrl] = useState('');
   const [inputValue, setInputValue] = useState({
     current: false,
-    show: false
+    show: true
   });
+
+  const handlePersonalClick = () => {
+    dispatch(updateWizardScreen('personal'))
+  };
 
   const handleNewButtonClick = () => {
     dispatch(updateWizardScreen('new'))
@@ -20,20 +24,12 @@ const WizardGeneric = () => {
 
   const onWizardBoxClick = (type) => {
     const funcs = {
+      personal: handlePersonalClick,
       new: handleNewButtonClick
     };
 
     if (funcs[type]) return funcs[type]();
   };
-
-  // const getCount = (item, val) => {
-  //   const func = {
-  //     personal: () => dispatch(updatePersonalData(val)),
-  //     collected: () => dispatch(updateCollectedData(val)),
-  //   };
-
-  //   if (func[item]) func[item]();
-  // }
 
   const getTabDetails = (tab) => {
     setActiveUrl(tab.url.split('?')[0].split('//')[1].split('/')[0]);
@@ -59,21 +55,9 @@ const WizardGeneric = () => {
     }));
   }
 
-  // const getCountData = (val) => {
-  //   console.log(val.length);
-  // };
-
-  // const handleCount = () => {
-  //   wizardData.forEach(item => {
-  //     StorageHelper.get({ key: item, callback: getCount.bind(this, item) });
-  //   });
-  // };
-
   useEffect(() => {
     StorageHelper.getTab(getTabDetails);
     StorageHelper.get({ key: 'toggle', callback: getToggleData });
-
-    // handleCount();
   }, []);
 
   return (

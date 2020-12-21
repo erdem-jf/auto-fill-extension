@@ -5,6 +5,7 @@ import WizardForm from '../WizardForm';
 import Header from '../Header';
 import WizardGeneric from '../WizardGeneric';
 import WizardNew from '../WizardNew';
+import Personal from '../Personal';
 import StorageHelper from '../../helpers/storage.helper';
 import PodoImg from '../../../../assets/img/podo.png';
 
@@ -12,7 +13,7 @@ const Wizard = () => {
   const { dispatch, state } = useContext(MainContext);
 
   const handleLogout = () => {
-    ['user', 'personal', 'wizard', 'toggle'].forEach(key => StorageHelper.remove(key));
+    ['user', 'personal', 'collected', 'wizard', 'toggle'].forEach(key => StorageHelper.remove(key));
     dispatch(removeUserData());
   }
 
@@ -20,7 +21,8 @@ const Wizard = () => {
     const components = {
       bio: () => <WizardForm />,
       generic: () => <WizardGeneric />,
-      new: () => <WizardNew />
+      new: () => <WizardNew />,
+      personal: () => <Personal />
     }
 
     return components[state.wizard.screen] ? components[state.wizard.screen]() : null;

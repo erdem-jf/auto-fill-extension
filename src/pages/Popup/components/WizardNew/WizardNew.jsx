@@ -1,15 +1,18 @@
 import React, {  useContext, useState } from 'react';
+import { string } from 'prop-types';
 import { MainContext } from '../../store';
 import StorageHelper from '../../helpers/storage.helper';
-import { setLoading, updateCollectedData ,updateWizardScreen } from '../../actions';
+import { setLoading, updateCollectedData, updatePersonalData ,updateWizardScreen } from '../../actions';
 
-const WizardNew = () => {
+const WizardNew = ({
+  category
+}) => {
   const { dispatch, state } = useContext(MainContext);
   const [formData, setFormData] = useState([
     {
-      question: 'What is the name of your first pet?',
-      answer: 'Zeytin',
-      id: 'collected'
+      question: category === 'collected' ? 'What is the name of your first pet?' : 'What is your email adress',
+      answer: category === 'collected' ? 'Zeytin' : 'example@jotform.com',
+      id: category
     }
   ]);
 
@@ -33,7 +36,7 @@ const WizardNew = () => {
     const newFormData = [...formData, ...[{
       question: '',
       answer: '',
-      id: 'collected'
+      id: category
     }]];
 
     setFormData(newFormData);
@@ -56,9 +59,13 @@ const WizardNew = () => {
     e.preventDefault();
     dispatch(setLoading(true));
 
+    console.log('formData', formData);
+
+    StorageHelper.save({ type: formData[0].id || category, data: formData });
+
     formData.forEach((item) => {
-      StorageHelper.save({ type: item.id || 'collected', data: [ item ] });
-      dispatch(updateCollectedData([ item ]));
+      const func = category === 'collected' ? updateCollectedData : updatePersonalData;
+      dispatch(func([ item ]));
     });
 
     dispatch(setLoading(false));
@@ -104,6 +111,14 @@ const WizardNew = () => {
       }
     </div>
   );
+};
+
+WizardNew.propTypes = {
+  category: string
+};
+
+WizardNew.defaultProps = {
+  category: 'collected'
 };
 
 export default WizardNew;

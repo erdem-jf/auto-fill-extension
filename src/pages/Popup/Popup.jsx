@@ -47,11 +47,13 @@ const Popup = () => {
   }
 
   const handleWizardScreen = (val) => {
-    const isBioExist = (val && val.find(item => item.bio)) || false;
+    const isBioExist = (val && val.find(item => item.question === 'bio')) || false;
     dispatch(updateWizardScreen(isBioExist ? 'generic' : 'bio'));
   }
 
   const getCount = (item, val) => {
+    if (!val) return;
+
     const func = {
       personal: () => dispatch(updatePersonalData(val)),
       collected: () => dispatch(updateCollectedData(val)),

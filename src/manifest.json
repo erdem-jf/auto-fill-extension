@@ -2,7 +2,9 @@
   "name": "JF auto fill",
   "options_page": "options.html",
   "background": {
-    "page": "background.html"
+    "scripts": [
+      "background.bundle.js"
+    ]
   },
   "browser_action": {
     "default_popup": "popup.html",
@@ -25,6 +27,7 @@
   "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
   "permissions": [
     "storage",
-    "tabs"
+    "tabs",
+    "http://erdem.jotform.pro:21105/ai/completions"
   ]
 }
