@@ -1,0 +1,90 @@
+.jaf-popup-settings {
+  padding: 2rem;
+
+  form {
+    div {
+      &:first-child {
+        position: relative;
+        margin-bottom: 1rem;
+
+        &::before, &::after {
+          content: "";
+          position: absolute;
+          bottom: 18px;
+          background-color: $label-color;
+          width: 1px;
+          height: 10px;
+        }
+
+        &::before {
+          right: 16px;
+          transform: rotate(45deg);
+        }
+
+        &::after {
+          right: 22px;
+          transform: rotate(135deg);
+        }
+
+        label {
+          margin-bottom: .5rem;
+        }
+      }
+
+      &:not(:first-child) {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+
+        label {
+          width: 100%;
+        }
+
+        input {
+          width: calc(100% - 4rem);
+          padding: .75rem 0;
+          margin: 0;
+        }
+
+        span {
+          width: 2.5rem;
+          height: 1.5rem;
+          margin-left: 1rem;
+          border: 1px solid $label-color;
+          border-radius: 4px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          font-size: .875rem;
+        }
+      }
+    }
+
+    select, input {
+      cursor: pointer;
+    }
+
+    select {
+      width: 100%;
+      height: 3rem;
+      border-radius: 4px;
+      background-color: transparent;
+      padding-left: .5rem;
+      padding-right: 1rem;
+      outline: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+    }
+
+    & > section {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 1rem;
+  
+      button {
+        padding: .875rem 1.5rem;
+      }
+    }
+  }
+}

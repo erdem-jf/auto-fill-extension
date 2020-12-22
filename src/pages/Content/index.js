@@ -32,6 +32,7 @@ window.onload = () => {
 
   const initialRender = () => {
     console.log('initial render@Content');
+    Content.listenContextMenu();
     getDetails();
 
     chrome.storage.onChanged.addListener(function (changes, namespace) {

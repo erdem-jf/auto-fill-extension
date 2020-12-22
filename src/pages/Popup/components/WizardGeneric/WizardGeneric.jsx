@@ -32,13 +32,12 @@ const WizardGeneric = () => {
   const getTabDetails = (tab) => {
     setUrl(tab.url);
     // setActiveUrl(tab.url.split('?')[0].split('//')[1].split('/')[0]);
+
   };
 
   const getDisabledList = (disabledList) => {
     if (disabledList.length > 0) {
-      disabledList.forEach(item => {
-        console.log(url);
-        console.log(item);
+      disabledList.forEach(item => {;
         if (item.url === url) {
           setDisabledInputValue(item.status);
         }
@@ -49,13 +48,11 @@ const WizardGeneric = () => {
   };
 
   const handleDisableForThisSite = ({ target: { checked } }) => {
-    console.log('state.disabledList', state.disabledList);
     let targetIndex;
     const itemIsExist = state.disabledList.find((item, index) => {
       targetIndex = index;
       return item.url === url;
     });
-    console.log('itemIsExist', itemIsExist);
     
     const newDisabledList = [...state.disabledList];
     if (itemIsExist) {

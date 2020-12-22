@@ -1,16 +1,21 @@
 import React, { useContext } from 'react';
 import { MainContext } from '../../store';
-import { removeUserData } from '../../actions';
+import { removeUserData, updateWizardScreen } from '../../actions';
 import WizardForm from '../WizardForm';
 import Header from '../Header';
 import WizardGeneric from '../WizardGeneric';
 import WizardNew from '../WizardNew';
 import Personal from '../Personal';
+import Settings from '../Settings';
 import StorageHelper from '../../helpers/storage.helper';
 import PodoImg from '../../../../assets/img/podo.png';
 
 const Wizard = () => {
   const { dispatch, state } = useContext(MainContext);
+
+  const handleSettings = () => {
+    dispatch(updateWizardScreen('settings'));
+  }
 
   const handleLogout = () => {
     ['user', 'personal', 'collected', 'wizard', 'toggle', 'settings'].forEach(key => StorageHelper.remove(key));
@@ -22,7 +27,8 @@ const Wizard = () => {
       bio: () => <WizardForm />,
       generic: () => <WizardGeneric />,
       new: () => <WizardNew />,
-      personal: () => <Personal />
+      personal: () => <Personal />,
+      settings: () => <Settings />
     }
 
     return components[state.wizard.screen] ? components[state.wizard.screen]() : null;
@@ -36,6 +42,7 @@ const Wizard = () => {
         username={state.user.username}
         email={state.user.email}
         handleLogout={handleLogout}
+        handleSettings={handleSettings}
       />
       {renderScreen()}
     </div>

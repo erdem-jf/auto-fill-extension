@@ -4,6 +4,10 @@ import '../../assets/img/icon-34.png';
 import '../../assets/img/icon-128.png';
 
 class Background {
+  constructor() {
+    this.clickHandler = this.clickHandler.bind(this);
+  }
+
   async search(query) {
     const options = {
       engine: 'davinci',
@@ -49,8 +53,6 @@ class Background {
 
     const result = await RequestHelper.generate(options);
 
-    console.log('result', result);
-
     return result;
   }
 
@@ -79,8 +81,37 @@ class Background {
     });
   }
 
+  clickHandler(info, tab) {
+    chrome.tabs.sendMessage(tab.id, 'getClickedEl', ({ msg }) => {
+      console.log(msg);
+    });
+  }
+
+  createContextMenu() {
+    chrome.contextMenus.create({
+      title: 'JotForm Auto-Fill',
+      id: 'jf',
+      contexts: ['all'],
+    });
+
+    chrome.contextMenus.create({
+      title: 'Fill this area',
+      parentId: 'jf',
+      contexts: ['all'],
+      onclick: this.clickHandler,
+    });
+
+    chrome.contextMenus.create({
+      title: 'Inspect',
+      parentId: 'jf',
+      contexts: ['all'],
+      onclick: () => alert('Not yet Samurai!'),
+    });
+  }
+
   init() {
     this.syncData();
+    this.createContextMenu();
   }
 }
 

@@ -28,6 +28,7 @@
   "permissions": [
     "storage",
     "tabs",
+    "contextMenus",
     "http://erdem.jotform.pro:21105/ai/completions"
   ]
 }

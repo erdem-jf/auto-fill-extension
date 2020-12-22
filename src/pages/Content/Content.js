@@ -10,6 +10,7 @@ class Content {
 
     this.handleButtonClick = this.handleButtonClick.bind(this);
     this.connectAndSyncWithStorage = this.connectAndSyncWithStorage.bind(this);
+    this.listenContextMenu = this.listenContextMenu.bind(this);
 
     this.categories = ['information', 'idea', 'personal', 'history'];
     this.data = {
@@ -46,16 +47,23 @@ class Content {
 
   async handleButtonClick({ input, label }, { target: buttonEl }) {
     console.log('innerText', label.innerText);
-    buttonEl.disabled = true;
-    buttonEl.classList.add('has-loading');
+    if (buttonEl) {
+      buttonEl.disabled = true;
+      buttonEl.classList.add('has-loading');
+    }
 
     const removeLoadingFromCurrentButton = () => {
-      buttonEl.disabled = false;
-      buttonEl.classList.remove('has-loading');
+      if (buttonEl) {
+        buttonEl.disabled = false;
+        buttonEl.classList.remove('has-loading');
+      }
 
       if (label.getAttribute('role') === 'heading') {
         input.nextElementSibling.style.display = 'none';
       }
+
+      if (document.querySelector('.jaf-extension-loading'))
+        document.querySelector('.jaf-extension-loading').remove();
     };
 
     try {
@@ -217,6 +225,152 @@ class Content {
     });
 
     resizeObserver.observe(document.querySelector('body'));
+  }
+
+  listenContextMenu() {
+    let label = null;
+    let input = null;
+
+    document.addEventListener(
+      'contextmenu',
+      (event) => {
+        let i = 0;
+        input = event.target;
+        let parentEl = event.target;
+        let targetLabel;
+
+        while (i < 10) {
+          const el =
+            parentEl.parentNode.querySelector('label') ||
+            parentEl.parentNode.querySelector('div[role="heading"]');
+
+          if (el) {
+            targetLabel = el;
+            i = 10;
+          }
+
+          parentEl = parentEl.parentNode;
+          i++;
+        }
+
+        label =
+          document.querySelector(`label[for="${input.id}"]`) || targetLabel;
+      },
+      true
+    );
+
+    chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+      if (request === 'getClickedEl') {
+        this.createLoading();
+        this.handleButtonClick({ input, label }, { target: null });
+
+        sendResponse({
+          msg: 'handleButtonClick started!',
+        });
+      }
+    });
+  }
+
+  createLoading() {
+    const div = document.createElement('div');
+    div.setAttribute('class', 'jaf-extension-loading');
+    div.innerHTML = `
+      <div class="jaf-extension-button-loader">
+      <div class="container">
+      <div class="podo">
+        <div class="hat"></div>
+        <div class="drop"></div>
+        <div class="drop reverse"></div>
+        <div class="hat-detail"></div>
+        <div class="under-hat"></div>
+        <div class="ear-left">
+          <div class="inner-left">
+            <div class="hair-left">
+              <div class="curve-hair-f"></div>
+              <div class="curve-inner-l"></div>
+            </div>
+          </div>
+        </div>
+        <div class="ear-right">
+          <div class="inner-right">
+            <div class="hair-right">
+              <div class="curve-hair-r"></div>
+              <div class="curve-inner-r"></div>
+            </div>
+          </div>
+        </div>
+        <div class="face">
+          <div class="face-hair1">
+            <div class="curve-hair1"></div>
+          </div>
+          <div class="face-hair2">
+            <div class="curve-hair"></div>
+          </div>
+          <div class="eye-left">
+            <div class="eye-ball">
+              <div class="eye-shadow1"></div>
+              <div class="eye-shadow2"></div>
+              <div class="eye-shadow3"></div>
+            </div>
+          </div>
+          <div class="eye-right">
+            <div class="eye-ball">
+              <div class="eye-shadow1"></div>
+              <div class="eye-shadow2"></div>
+              <div class="eye-shadow3"></div>
+            </div>
+          </div>
+          <div class="nose">
+            <div class="nose-in"></div>
+          </div>
+          <div class="nose-line"></div>
+          <div class="cheek"></div>
+          <div class="mouth">
+            <div class="tongue"></div>
+          </div>
+        </div>
+        <div class="arm"></div>
+        <div class="left-arm"></div>
+        <div class="right-hand"></div>
+        <div class="belt"></div>
+        <div class="gondol"></div>
+        <div class="left-gondol"></div>
+        <div class="draglink"></div>
+        <div class="hand"></div>
+        <div class="shorts">
+          <div class="middle-short"></div>
+          <div class="right-short"></div>
+          <div class="left-short"></div>
+          <div class="short-leg"></div>
+          <div class="leg-left">
+            <div class="socks"></div>
+            <div class="shoes">
+              <div class="base">
+                <div class="left-base"></div>
+                <div class="pedal"></div>
+              </div>
+            </div>
+          </div>
+          <div class="leg-right">
+            <div class="socks"></div>
+            <div class="shoes">
+              <div class="right-base"></div>
+              <div class="pedal left-p"></div>
+    
+            </div>
+          </div>
+          <div class="skeleton"></div>
+          <div class="curve-skeleton"></div>
+          <div class="circle-line"></div>
+          <div class="circle-line is-two"></div>
+          <div class="circle-line is-three"></div>
+        </div>
+        <div class="floor"></div>
+      </div>
+      </div>
+    `;
+
+    document.body.appendChild(div);
   }
 
   init({ showIcon }) {
