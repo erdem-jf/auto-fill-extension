@@ -3,10 +3,11 @@ import StorageHelper from '../Popup/helpers/storage.helper';
 class Content {
   constructor() {
     this.textInputs = document.querySelectorAll('input:not([type="hidden"])');
+    this.textareaEls = document.querySelectorAll('textarea');
     // this.contentEditableEls = document.querySelectorAll(
     //   'div[contenteditable="true"]'
     // );
-    this.inputs = [...this.textInputs];
+    this.inputs = [...this.textInputs, ...this.textareaEls];
 
     this.handleButtonClick = this.handleButtonClick.bind(this);
     this.connectAndSyncWithStorage = this.connectAndSyncWithStorage.bind(this);
@@ -18,9 +19,25 @@ class Content {
       personal: '',
       collected: '',
     };
+
+    this.isWebSiteDisabled = false;
   }
 
   getStorageData(key, arr) {
+    if (key === 'disabledList') {
+      arr.forEach((item) => {
+        const isExist = item.url === window.location.href;
+
+        if (isExist) this.isWebSiteDisabled = item.status;
+
+        return;
+      });
+
+      console.log('@@@@@', this.isWebSiteDisabled);
+
+      return;
+    }
+
     if (arr) {
       let string = '';
 
@@ -35,7 +52,7 @@ class Content {
 
   connectAndSyncWithStorage() {
     try {
-      ['personal', 'collected'].forEach((key) => {
+      ['personal', 'collected', 'disabledList'].forEach((key) => {
         StorageHelper.get({
           key,
           callback: this.getStorageData.bind(this, key),
@@ -44,6 +61,15 @@ class Content {
     } catch (err) {
       console.error(err);
     }
+  }
+
+  fillElements({ input, answer }) {
+    const funcs = {
+      textarea: () => (input.innerText = answer),
+      text: () => input.setAttribute('value', answer),
+    };
+
+    funcs[input.type] && funcs[input.type]();
   }
 
   async handleButtonClick({ input, label }, { target: buttonEl }) {
@@ -95,7 +121,8 @@ class Content {
               },
               (response) => {
                 const answer = response.data.data.choices[0].text;
-                input.setAttribute('value', answer.split('A:')[1]);
+                console.log('input', input.nodeName);
+                this.fillElements({ input, answer: answer.split('A:')[1] });
                 removeLoadingFromCurrentButton();
               }
             );
@@ -113,7 +140,8 @@ class Content {
                   .split('A:');
 
                 const answer = textArr[textArr.length - 1];
-                input.setAttribute('value', answer);
+                console.log('input', input.nodeName);
+                this.fillElements({ input, answer });
                 removeLoadingFromCurrentButton();
               }
             );

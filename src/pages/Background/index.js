@@ -1,5 +1,4 @@
 import RequestHelper from '../Popup/helpers/request.helper';
-import StorageHelper from '../Popup/helpers/storage.helper';
 import '../../assets/img/icon-34.png';
 import '../../assets/img/icon-128.png';
 
@@ -25,7 +24,7 @@ class Background {
     const options = {
       engine: 'davinci',
       prompt,
-      max_tokens: 96,
+      max_tokens: 200,
       temperature: 0,
       top_p: 1,
       stop: ['Q'],
@@ -126,8 +125,6 @@ class Background {
 
               arr.push(item);
             });
-
-            // storageHelper.save({ key: 'collected', data: arr });
           }
         }
       },
@@ -139,19 +136,15 @@ class Background {
       (details) => {
         if (details.method === 'POST' && details.type === 'main_frame') {
           setTimeout(() => {
-            chrome.tabs.query(
-              { active: true, currentWindow: true },
-              function (tabs) {
-                console.log(tabs);
-                chrome.tabs.sendMessage(
-                  tabs[0].id,
-                  { type: 'getFormData', data: arr },
-                  (response) => {
-                    console.log('response received', response);
-                  }
-                );
-              }
-            );
+            chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+              chrome.tabs.sendMessage(
+                tabs[0].id,
+                { type: 'getFormData', data: arr },
+                (response) => {
+                  console.log('response received', response);
+                }
+              );
+            });
           }, 1000);
         }
       },

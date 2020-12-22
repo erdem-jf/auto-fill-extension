@@ -7,6 +7,7 @@ import WizardGeneric from '../WizardGeneric';
 import WizardNew from '../WizardNew';
 import Personal from '../Personal';
 import Settings from '../Settings';
+import CollectedView from '../CollectedView';
 import StorageHelper from '../../helpers/storage.helper';
 import PodoImg from '../../../../assets/img/podo.png';
 
@@ -28,7 +29,8 @@ const Wizard = () => {
       generic: () => <WizardGeneric />,
       new: () => <WizardNew />,
       personal: () => <Personal />,
-      settings: () => <Settings />
+      settings: () => <Settings />,
+      collected: () => <CollectedView />
     }
 
     return components[state.wizard.screen] ? components[state.wizard.screen]() : null;
