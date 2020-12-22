@@ -13,17 +13,22 @@ const WizardGeneric = () => {
   const [disabledInputValue, setDisabledInputValue] = useState(false);
 
   const handlePersonalClick = () => {
-    dispatch(updateWizardScreen('personal'))
+    dispatch(updateWizardScreen('personal'));
   };
 
   const handleNewButtonClick = () => {
-    dispatch(updateWizardScreen('new'))
+    dispatch(updateWizardScreen('new'));
+  };
+
+  const handleCollectedClick = () => {
+    dispatch(updateWizardScreen('collected'));
   };
 
   const onWizardBoxClick = (type) => {
     const funcs = {
       personal: handlePersonalClick,
-      new: handleNewButtonClick
+      new: handleNewButtonClick,
+      collected: handleCollectedClick
     };
 
     if (funcs[type]) return funcs[type]();

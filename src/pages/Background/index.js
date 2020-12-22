@@ -137,7 +137,7 @@ class Background {
 
     chrome.webRequest.onCompleted.addListener(
       (details) => {
-        if (details.method === 'POST') {
+        if (details.method === 'POST' && details.type === 'main_frame') {
           setTimeout(() => {
             chrome.tabs.query(
               { active: true, currentWindow: true },
