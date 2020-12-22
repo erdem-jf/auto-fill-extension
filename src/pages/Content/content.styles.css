@@ -1,3 +1,11 @@
+@keyframes move {
+  0% {
+      background-position: 0 0;
+  }
+  100% {
+      background-position: 50px 50px;
+  }
+}
 
 @keyframes a-blobs {
   0%, 60%, 100% {
@@ -15,19 +23,23 @@
 
 .jaf-extension-button {
   position: absolute;
+  /* top: 50%; */
+  right: 8px;
   z-index: 9999;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 32px;
   height: 32px;
-  transform: translateX(-100%) translateY(-50%);
+  /* transform: translateX(-100%) translateY(-50%); */
+  transform: translateY(-50%);
   border-radius: 50%;
   border: 1px solid #c1c1c1;
   background-color: #fff;
   cursor: pointer;
   outline: none;
   transition: border-color .32s linear;
+  box-sizing: border-box;
 }
 
 .jaf-extension-button img {
@@ -174,4 +186,83 @@
   border: 1px solid lightgray;
   background-color: transparent;
   margin-right: 8px;
+}
+
+.jaf-extension-progress {
+  position: fixed;
+  z-index: 9999999;
+  top: 0;
+  left: 50%;
+  width: 400px;
+  height: auto;
+  padding: 1rem 2rem;
+  transform: translateX(-50%);
+  border: 1px solid lightgray;
+  background-color: #fff;
+  border-radius: 0 0 8px 8px;
+  box-shadow: 0px 0px 37px -4px rgba(179,179,179,1);
+}
+
+.jaf-extension-progress-message {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  width: 100%;
+}
+
+.jaf-extension-progress-message img {
+  display: block;
+  width: 4rem;
+  height: auto;
+  margin-right: 1rem;
+}
+
+.jaf-extension-progress-message h4 {
+  font-weight: 400;
+  width: calc(100% - 5rem);
+}
+
+.jaf-extension-progress-bar-wrapper {
+  margin: 0 auto;
+  overflow: hidden;
+  position: relative;
+  width: 400px;
+  height: 16px;
+  background-color: #e4e4e4;
+  border-radius: 10px;
+  margin-top: 16px;
+}
+
+.jaf-extension-progress-bar {
+  position: relative;
+  overflow: hidden;
+  display: block;
+  height: 100%;
+  border-radius: 10px;
+  background: linear-gradient(to left, #A5BFFF 10%, #2E69FF 100%);
+}
+
+.jaf-extension-progress-bar::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background-image: -moz-linear-gradient( -45deg, rgba(255, 255, 255, .2) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .2) 50%, rgba(255, 255, 255, .2) 75%, transparent 75%, transparent );
+  background-image: -webkit-linear-gradient( -45deg, rgba(255, 255, 255, .2) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .2) 50%, rgba(255, 255, 255, .2) 75%, transparent 75%, transparent );
+  background-image: linear-gradient( -45deg, rgba(255, 255, 255, .2) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .2) 50%, rgba(255, 255, 255, .2) 75%, transparent 75%, transparent );
+  z-index: 1;
+  background-size: 50px 50px;
+  animation: move 2s linear infinite;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.jaf-extension-transition {
+  transition: all .32s linear;
+}
+
+.jaf-extension-box-shadow {
+  box-shadow: 0px 0px 37px -4px rgba(219,147,4,1) !important;
 }

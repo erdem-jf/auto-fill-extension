@@ -41,7 +41,7 @@ class Background {
       // context: 'Q: Who discovered the America?',
       stream: false,
       stop: '/n',
-      length: 200,
+      length: 400,
       best_of: 1,
       completions: 1,
       frequency_penalty: 0,
@@ -87,6 +87,12 @@ class Background {
     });
   }
 
+  fillAllForm(info, tab) {
+    chrome.tabs.sendMessage(tab.id, { type: 'fillAllForm' }, ({ msg }) => {
+      console.log(msg);
+    });
+  }
+
   createContextMenu() {
     chrome.contextMenus.create({
       title: 'JotForm Auto-Fill',
@@ -99,6 +105,13 @@ class Background {
       parentId: 'jf',
       contexts: ['all'],
       onclick: this.clickHandler,
+    });
+
+    chrome.contextMenus.create({
+      title: 'Fill the all form',
+      parentId: 'jf',
+      contexts: ['all'],
+      onclick: this.fillAllForm,
     });
 
     chrome.contextMenus.create({

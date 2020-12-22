@@ -3,10 +3,7 @@ import StorageHelper from '../Popup/helpers/storage.helper';
 class Content {
   constructor() {
     this.textInputs = document.querySelectorAll('input:not([type="hidden"])');
-    this.textareaEls = document.querySelectorAll('textarea');
-    // this.contentEditableEls = document.querySelectorAll(
-    //   'div[contenteditable="true"]'
-    // );
+    this.textareaEls = document.querySelectorAll('form textarea');
     this.inputs = [...this.textInputs, ...this.textareaEls];
 
     this.handleButtonClick = this.handleButtonClick.bind(this);
@@ -32,8 +29,6 @@ class Content {
 
         return;
       });
-
-      console.log('@@@@@', this.isWebSiteDisabled);
 
       return;
     }
@@ -65,11 +60,11 @@ class Content {
 
   fillElements({ input, answer }) {
     const funcs = {
-      textarea: () => (input.innerText = answer),
-      text: () => input.setAttribute('value', answer),
+      TEXTAREA: () => (input.innerText = answer),
+      INPUT: () => input.setAttribute('value', answer),
     };
 
-    funcs[input.type] && funcs[input.type]();
+    funcs[input.nodeName] && funcs[input.nodeName]();
   }
 
   async handleButtonClick({ input, label }, { target: buttonEl }) {
@@ -172,13 +167,12 @@ class Content {
       'click',
       this.handleButtonClick.bind(this, { input, label })
     );
-    button.setAttribute(
-      'style',
-      `
-      top: ${top + height / 2}px;
-      left: ${left + width - 4}px;
-    `
-    );
+    // button.setAttribute(
+    //   'style',
+    //   `
+    //   top: ${height / 2}px;
+    // `
+    // );
 
     return button;
   }
@@ -196,6 +190,14 @@ class Content {
     }
 
     this.inputs.forEach((input) => {
+      window.scrollTo(0, 0);
+
+      if (
+        input.nodeName === 'INPUT' &&
+        ['file', 'tel'].includes(input.getAttribute('type'))
+      )
+        return;
+
       const { id: inputId } = input;
       let i = 0;
       let parentEl = input;
@@ -218,19 +220,33 @@ class Content {
       const label =
         document.querySelector(`label[for="${inputId}"]`) || targetLabel;
       // if the target input has the label with same id
-      if (!label && input.nodeName !== 'DIV') return;
+      if (!label) return;
 
       const { top, left, width, height } = input.getBoundingClientRect();
-      this.button = this.createExtensionLogo({
+
+      const button = this.createExtensionLogo({
         top,
         left,
         width,
         height,
         input,
-        label: input.nodeName !== 'DIV' ? label : input,
+        label,
       });
 
-      document.querySelector('body').appendChild(this.button);
+      const parentNodeStyle = input.parentNode.getAttribute('style');
+      const hasDisplay =
+        typeof parentNodeStyle === 'string'
+          ? parentNodeStyle.indexOf('display:') > -1
+          : false;
+      const hasNone =
+        typeof parentNodeStyle === 'string'
+          ? parentNodeStyle.indexOf('none') > -1
+          : false;
+      const hasDisplayNone = hasDisplay && hasNone;
+
+      if (!hasDisplayNone)
+        input.parentNode.style = 'position: relative; display: block';
+      input.parentNode.appendChild(button);
     });
   }
 
@@ -239,17 +255,13 @@ class Content {
       document
         .querySelectorAll('.jaf-extension-button')
         .forEach((item, index) => {
-          const { left, top, width, height } = this.inputs[
-            index
-          ].getBoundingClientRect();
-
-          item.setAttribute(
-            'style',
-            `
-            top: ${top + height / 2}px;
-            left: ${left + width - 4}px;
-          `
-          );
+          // const { height } = this.inputs[index].getBoundingClientRect();
+          // item.setAttribute(
+          //   'style',
+          //   `
+          //   top: ${height / 2}px;
+          // `
+          // );
         });
     });
 
@@ -288,6 +300,39 @@ class Content {
     document.body.appendChild(div);
   }
 
+  autoFill() {
+    this.inputs.forEach((input, index) => {
+      input.classList.add('jaf-extension-transition');
+
+      setTimeout(() => {
+        if (this.inputs[index - 1]) {
+          this.inputs[index - 1].classList.remove('jaf-extension-box-shadow');
+          this.inputs[index - 1].classList.remove('jaf-extension-transition');
+          this.fillElements({ input: this.inputs[index - 1], answer: 'Test' });
+        }
+
+        input.classList.add('jaf-extension-box-shadow');
+      }, index * 1000);
+    });
+  }
+
+  createProgressSection() {
+    const div = document.createElement('div');
+    div.setAttribute('class', 'jaf-extension-progress');
+
+    div.innerHTML = `
+      <div class="jaf-extension-progress-message">
+        <img src="https://www.jotform.com/wepay/assets/img/podo.png?v=1.0.0.0" alt="jotform-podo" />
+        <h4>Form is filling by JotForm AI</h4>
+        <div class="jaf-extension-progress-bar-wrapper">
+          <div class="jaf-extension-progress-bar"></div>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(div);
+  }
+
   listenContextMenu() {
     let label = null;
     let input = null;
@@ -321,6 +366,12 @@ class Content {
     );
 
     chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+      console.log(request.type);
+      if (request.type === 'fillAllForm') {
+        this.createProgressSection();
+        this.autoFill();
+      }
+
       if (request.type === 'getClickedEl') {
         this.createLoading();
         this.handleButtonClick({ input, label }, { target: null });
