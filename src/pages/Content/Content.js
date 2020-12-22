@@ -11,6 +11,7 @@ class Content {
     this.handleButtonClick = this.handleButtonClick.bind(this);
     this.connectAndSyncWithStorage = this.connectAndSyncWithStorage.bind(this);
     this.listenContextMenu = this.listenContextMenu.bind(this);
+    this.listenFormData = this.listenFormData.bind(this);
 
     this.categories = ['information', 'idea', 'personal', 'history'];
     this.data = {
@@ -227,6 +228,38 @@ class Content {
     resizeObserver.observe(document.querySelector('body'));
   }
 
+  closeCollectDataQuestion(data) {
+    document.querySelector('.jaf-question-collect').remove();
+  }
+
+  handleCollectDataQuestion(data) {
+    StorageHelper.save({ key: 'collected', data });
+
+    document.querySelector('.jaf-question-collect').remove();
+  }
+
+  createCollectDataQuestion(data) {
+    const div = document.createElement('div');
+    div.setAttribute('class', 'jaf-question-collect');
+    div.innerHTML = `
+      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse semper mollis augue, ut gravida justo mollis at. Aenean maximus quam quis tempus pharetra. Pellentesque dapibus metus vel porttitor semper.</p>
+      <button id="close">Close</button>
+      <button id="save">Save</button>
+    `;
+    div
+      .querySelector('button#save')
+      .addEventListener(
+        'click',
+        this.handleCollectDataQuestion.bind(this, data)
+      );
+
+    div
+      .querySelector('button#close')
+      .addEventListener('click', this.closeCollectDataQuestion);
+
+    document.body.appendChild(div);
+  }
+
   listenContextMenu() {
     let label = null;
     let input = null;
@@ -260,7 +293,7 @@ class Content {
     );
 
     chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-      if (request === 'getClickedEl') {
+      if (request.type === 'getClickedEl') {
         this.createLoading();
         this.handleButtonClick({ input, label }, { target: null });
 
@@ -271,102 +304,28 @@ class Content {
     });
   }
 
+  listenFormData() {
+    chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+      console.log('request', request);
+      if (request.type === 'getFormData') {
+        const { data } = request;
+        this.createCollectDataQuestion(data);
+
+        sendResponse({
+          msg: 'listenFormData started!',
+        });
+      }
+    });
+  }
+
   createLoading() {
     const div = document.createElement('div');
     div.setAttribute('class', 'jaf-extension-loading');
     div.innerHTML = `
       <div class="jaf-extension-button-loader">
-      <div class="container">
-      <div class="podo">
-        <div class="hat"></div>
-        <div class="drop"></div>
-        <div class="drop reverse"></div>
-        <div class="hat-detail"></div>
-        <div class="under-hat"></div>
-        <div class="ear-left">
-          <div class="inner-left">
-            <div class="hair-left">
-              <div class="curve-hair-f"></div>
-              <div class="curve-inner-l"></div>
-            </div>
-          </div>
-        </div>
-        <div class="ear-right">
-          <div class="inner-right">
-            <div class="hair-right">
-              <div class="curve-hair-r"></div>
-              <div class="curve-inner-r"></div>
-            </div>
-          </div>
-        </div>
-        <div class="face">
-          <div class="face-hair1">
-            <div class="curve-hair1"></div>
-          </div>
-          <div class="face-hair2">
-            <div class="curve-hair"></div>
-          </div>
-          <div class="eye-left">
-            <div class="eye-ball">
-              <div class="eye-shadow1"></div>
-              <div class="eye-shadow2"></div>
-              <div class="eye-shadow3"></div>
-            </div>
-          </div>
-          <div class="eye-right">
-            <div class="eye-ball">
-              <div class="eye-shadow1"></div>
-              <div class="eye-shadow2"></div>
-              <div class="eye-shadow3"></div>
-            </div>
-          </div>
-          <div class="nose">
-            <div class="nose-in"></div>
-          </div>
-          <div class="nose-line"></div>
-          <div class="cheek"></div>
-          <div class="mouth">
-            <div class="tongue"></div>
-          </div>
-        </div>
-        <div class="arm"></div>
-        <div class="left-arm"></div>
-        <div class="right-hand"></div>
-        <div class="belt"></div>
-        <div class="gondol"></div>
-        <div class="left-gondol"></div>
-        <div class="draglink"></div>
-        <div class="hand"></div>
-        <div class="shorts">
-          <div class="middle-short"></div>
-          <div class="right-short"></div>
-          <div class="left-short"></div>
-          <div class="short-leg"></div>
-          <div class="leg-left">
-            <div class="socks"></div>
-            <div class="shoes">
-              <div class="base">
-                <div class="left-base"></div>
-                <div class="pedal"></div>
-              </div>
-            </div>
-          </div>
-          <div class="leg-right">
-            <div class="socks"></div>
-            <div class="shoes">
-              <div class="right-base"></div>
-              <div class="pedal left-p"></div>
-    
-            </div>
-          </div>
-          <div class="skeleton"></div>
-          <div class="curve-skeleton"></div>
-          <div class="circle-line"></div>
-          <div class="circle-line is-two"></div>
-          <div class="circle-line is-three"></div>
-        </div>
-        <div class="floor"></div>
-      </div>
+        <div class="jaf-extension-button-loader__blob"></div>
+        <div class="jaf-extension-button-loader__blob"></div>
+        <div class="jaf-extension-button-loader__blob"></div>
       </div>
     `;
 

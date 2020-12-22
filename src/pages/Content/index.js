@@ -11,7 +11,7 @@ window.onload = () => {
 
   const getSettingsFromStorage = (settings) => {
     console.log('settings@content/index');
-    showIcon = settings.showIcon;
+    showIcon = (settings && settings.showIcon) || false;
   };
 
   const funcs = {
@@ -33,6 +33,7 @@ window.onload = () => {
   const initialRender = () => {
     console.log('initial render@Content');
     Content.listenContextMenu();
+    Content.listenFormData();
     getDetails();
 
     chrome.storage.onChanged.addListener(function (changes, namespace) {

