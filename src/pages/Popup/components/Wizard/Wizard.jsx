@@ -19,7 +19,7 @@ const Wizard = () => {
   }
 
   const handleLogout = () => {
-    ['user', 'personal', 'collected', 'wizard', 'toggle', 'settings'].forEach(key => StorageHelper.remove(key));
+    ['user', 'personal', 'collected', 'wizard', 'toggle', 'settings', 'disabledList'].forEach(key => StorageHelper.remove(key));
     dispatch(removeUserData());
   }
 

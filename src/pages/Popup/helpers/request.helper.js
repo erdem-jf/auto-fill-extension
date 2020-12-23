@@ -4,7 +4,7 @@ import StorageHelper from './storage.helper';
 
 function RequestHelper() {
   this.appKey = '';
-  this.loginUrl = 'https://erdem.jotform.pro/API/user/login';
+  this.loginUrl = 'https://api.jotform.com/user/login';
   this.logoutUrl = 'https://erdem.jotform.pro/API/user/logout';
   this.userUrl = `https://erdem.jotform.pro/API/user?apiKey=${this.appKey}`;
   this.completionUrl = 'http://erdem.jotform.pro:21105/ai/completions';
@@ -43,7 +43,6 @@ function RequestHelper() {
   };
 
   this.getUser = async () => {
-    console.log(this.appKey);
     try {
       const response = await axios.get(this.userUrl);
 
@@ -55,7 +54,6 @@ function RequestHelper() {
 
   this.search = async (options) => {
     try {
-      console.log('try works!', options);
       const response = await axios.post(this.searchUrl, options);
 
       return response;
@@ -75,10 +73,8 @@ function RequestHelper() {
   };
 
   this.generate = async (options) => {
-    console.log('options', options);
     try {
       const response = await axios.post(this.generateUrl, options);
-      console.log('response', response);
 
       return response;
     } catch (err) {

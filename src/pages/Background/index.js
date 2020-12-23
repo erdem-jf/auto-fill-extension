@@ -1,11 +1,29 @@
 import RequestHelper from '../Popup/helpers/request.helper';
+import StorageHelper from '../Popup/helpers/storage.helper';
 import '../../assets/img/icon-34.png';
 import '../../assets/img/icon-128.png';
 
 class Background {
   constructor() {
-    this.clickHandler = this.clickHandler.bind(this);
+    this.fillArea = this.fillArea.bind(this);
+    this.fillAllForm = this.fillAllForm.bind(this);
     this.handleWebRequest = this.handleWebRequest.bind(this);
+  }
+
+  settingsStringToNumber(settings) {
+    const newSettings = {};
+
+    Object.keys(settings).forEach &&
+      Object.keys(settings).forEach((key) => {
+        console.log('key', key === 'engine');
+        if (key === 'engine') {
+          newSettings[key] = settings[key];
+        } else {
+          newSettings[key] = Number(settings[key]);
+        }
+      });
+
+    return newSettings;
   }
 
   async search(query) {
@@ -20,14 +38,22 @@ class Background {
     return result;
   }
 
-  async completions(prompt) {
+  async completions({ prompt, settings }) {
+    const newSettings = this.settingsStringToNumber(settings);
+    const { showIcon, length, ...rest } = newSettings;
+    console.log('rest', rest);
+
     const options = {
       engine: 'davinci',
       prompt,
       max_tokens: 200,
-      temperature: 0,
+      temperature: 0.4,
+      frequency_penalty: 0.6,
+      presence_penalty: 0.2,
       top_p: 1,
-      stop: ['Q'],
+      stop: ['Q:'],
+      best_of: 1,
+      ...rest,
     };
 
     const result = await RequestHelper.completions(options);
@@ -35,7 +61,10 @@ class Background {
     return result;
   }
 
-  async generate(params) {
+  async generate({ context, settings }) {
+    const { showIcon, ...rest } = this.settingsStringToNumber(settings);
+    console.log('newSettings', rest);
+
     const options = {
       engine: 'davinci',
       // context: 'Q: Who discovered the America?',
@@ -44,11 +73,12 @@ class Background {
       length: 400,
       best_of: 1,
       completions: 1,
-      frequency_penalty: 0,
-      presence_penalty: 0,
+      frequency_penalty: 0.6,
+      presence_penalty: 0.2,
       temperature: 0.4,
       top_p: 1,
-      ...params,
+      context,
+      ...rest,
     };
 
     const result = await RequestHelper.generate(options);
@@ -58,30 +88,37 @@ class Background {
 
   syncData() {
     chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
-      console.log('msg.type', msg.type);
-      if (msg.type === 'CATEGORIZE_DATA') {
-        this.search(msg.query).then((res) => {
-          sendResponse(res);
-        });
-      }
+      StorageHelper.get({
+        key: 'settings',
+        callback: (settings) => {
+          if (msg.type === 'CATEGORIZE_DATA') {
+            this.search(msg.query).then((res) => {
+              sendResponse(res);
+            });
+          }
 
-      if (msg.type === 'GENERATE_DATA') {
-        this.generate({ context: msg.context }).then((res) => {
-          sendResponse(res);
-        });
-      }
+          if (msg.type === 'GENERATE_DATA') {
+            this.generate({ context: msg.context, settings }).then((res) => {
+              sendResponse(res);
+            });
+          }
 
-      if (msg.type === 'COMPLETION') {
-        this.completions(msg.prompt).then((res) => {
-          sendResponse(res);
-        });
-      }
+          if (msg.type === 'COMPLETION') {
+            this.completions({
+              prompt: msg.prompt,
+              settings,
+            }).then((res) => {
+              sendResponse(res);
+            });
+          }
+        },
+      });
 
       return true;
     });
   }
 
-  clickHandler(info, tab) {
+  fillArea(info, tab) {
     chrome.tabs.sendMessage(tab.id, { type: 'getClickedEl' }, ({ msg }) => {
       console.log(msg);
     });
@@ -104,7 +141,7 @@ class Background {
       title: 'Fill this area',
       parentId: 'jf',
       contexts: ['all'],
-      onclick: this.clickHandler,
+      onclick: this.fillArea,
     });
 
     chrome.contextMenus.create({
@@ -112,13 +149,6 @@ class Background {
       parentId: 'jf',
       contexts: ['all'],
       onclick: this.fillAllForm,
-    });
-
-    chrome.contextMenus.create({
-      title: 'Inspect',
-      parentId: 'jf',
-      contexts: ['all'],
-      onclick: () => alert('Not yet Samurai!'),
     });
   }
 

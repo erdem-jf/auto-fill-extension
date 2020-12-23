@@ -20,15 +20,31 @@ class Content {
     this.isWebSiteDisabled = false;
   }
 
+  findPos(node) {
+    let curtop = 0;
+    let curtopscroll = 0;
+
+    if (node.offsetParent) {
+      do {
+        curtop += node.offsetTop;
+        curtopscroll += node.offsetParent ? node.offsetParent.scrollTop : 0;
+      } while ((node = node.offsetParent));
+
+      return curtop - curtopscroll;
+    }
+  }
+
   getStorageData(key, arr) {
     if (key === 'disabledList') {
-      arr.forEach((item) => {
-        const isExist = item.url === window.location.href;
+      arr &&
+        arr.forEach &&
+        arr.forEach((item) => {
+          const isExist = item.url === window.location.href;
 
-        if (isExist) this.isWebSiteDisabled = item.status;
+          if (isExist) this.isWebSiteDisabled = item.status;
 
-        return;
-      });
+          return;
+        });
 
       return;
     }
@@ -58,67 +74,81 @@ class Content {
     }
   }
 
+  removeLoadingStyleFromCurrentInput(input) {
+    const id = input.id || input.name;
+    const loadingEl = document.querySelector(
+      `.jaf-extension-loading[input-id="${id}"]`
+    );
+
+    if (loadingEl) {
+      loadingEl.remove();
+    }
+
+    input.classList.remove('jaf-extension-focus');
+
+    if (input.parentNode.querySelector('.jaf-extension-button'))
+      input.parentNode
+        .querySelector('.jaf-extension-button')
+        .classList.remove('has-loading');
+  }
+
   fillElements({ input, answer }) {
+    debugger;
     const funcs = {
       TEXTAREA: () => (input.innerText = answer),
       INPUT: () => input.setAttribute('value', answer),
     };
 
     funcs[input.nodeName] && funcs[input.nodeName]();
+
+    this.removeLoadingStyleFromCurrentInput(input);
   }
 
-  async handleButtonClick({ input, label }, { target: buttonEl }) {
-    console.log('innerText', label.innerText);
-    if (buttonEl) {
-      buttonEl.disabled = true;
-      buttonEl.classList.add('has-loading');
-    }
-
-    const removeLoadingFromCurrentButton = () => {
-      if (buttonEl) {
-        buttonEl.disabled = false;
-        buttonEl.classList.remove('has-loading');
-      }
-
-      if (label.getAttribute('role') === 'heading') {
-        input.nextElementSibling.style.display = 'none';
-      }
-
-      if (document.querySelector('.jaf-extension-loading'))
-        document.querySelector('.jaf-extension-loading').remove();
-    };
-
+  getInputType(text) {
     try {
+      let score = 0;
+      let result;
+      text.forEach((item, index) => {
+        if (item.score > score) {
+          score = item.score;
+          result = index;
+        }
+      });
+
+      const inputType = this.categories[result];
+      return inputType;
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  handleButtonClick({ input, label }, { target: buttonEl }) {
+    try {
+      if (buttonEl) buttonEl.classList.add('has-loading');
+
+      if (
+        input &&
+        input.getAttribute('class').indexOf('jaf-extension-focus') < 0
+      )
+        input.classList.add('jaf-extension-focus');
+
       chrome.runtime.sendMessage(
         { type: 'CATEGORIZE_DATA', query: label.innerText },
         (response) => {
-          let score = 0;
-          let result;
-          response.data.data.forEach((item, index) => {
-            if (item.score > score) {
-              score = item.score;
-              result = index;
-            }
-          });
-
-          const inputType = this.categories[result];
-          console.log('inputType', inputType);
+          const inputType = this.getInputType(response.data.data);
+          console.log('@INPUT_TYPE: ', inputType);
 
           if (['personal', 'information', 'history'].includes(inputType)) {
             chrome.runtime.sendMessage(
               {
                 type: 'COMPLETION',
-                prompt: `${
-                  ['information', 'personal'].includes(inputType)
-                    ? this.data.personal
-                    : ''
-                }Q: ${label.innerText}?`,
+                prompt: `${this.data.personal} Q: ${label.innerText}?`,
               },
               (response) => {
+                console.log('response', response);
                 const answer = response.data.data.choices[0].text;
-                console.log('input', input.nodeName);
+
                 this.fillElements({ input, answer: answer.split('A:')[1] });
-                removeLoadingFromCurrentButton();
               }
             );
           }
@@ -135,22 +165,27 @@ class Content {
                   .split('A:');
 
                 const answer = textArr[textArr.length - 1];
-                console.log('input', input.nodeName);
                 this.fillElements({ input, answer });
-                removeLoadingFromCurrentButton();
               }
             );
           }
         }
       );
     } catch (err) {
-      removeLoadingFromCurrentButton();
+      this.removeLoadingStyleFromCurrentInput(input);
       console.error(err);
     }
   }
 
+  removeAllButtons() {
+    document.querySelectorAll('.jaf-extension-button').forEach((button) => {
+      if (button && button.remove) button.remove();
+    });
+  }
+
   createExtensionLogo({ top, left, width, height, input, label }) {
     const button = document.createElement('button');
+    button.setAttribute('type', 'button');
     button.setAttribute('class', 'jaf-extension-button');
     button.innerHTML = `
       <img
@@ -163,6 +198,7 @@ class Content {
         <div class="jaf-extension-button-loader__blob"></div>
       </div>
     `;
+
     button.addEventListener(
       'click',
       this.handleButtonClick.bind(this, { input, label })
@@ -177,13 +213,8 @@ class Content {
     return button;
   }
 
-  removeAllButtons() {
-    document.querySelectorAll('.jaf-extension-button').forEach((button) => {
-      if (button && button.remove) button.remove();
-    });
-  }
-
   render({ showIcon }) {
+    console.log('showIcon', showIcon);
     if (!showIcon) {
       this.removeAllButtons();
       return;
@@ -248,24 +279,6 @@ class Content {
         input.parentNode.style = 'position: relative; display: block';
       input.parentNode.appendChild(button);
     });
-  }
-
-  resizeObserver() {
-    const resizeObserver = new ResizeObserver(() => {
-      document
-        .querySelectorAll('.jaf-extension-button')
-        .forEach((item, index) => {
-          // const { height } = this.inputs[index].getBoundingClientRect();
-          // item.setAttribute(
-          //   'style',
-          //   `
-          //   top: ${height / 2}px;
-          // `
-          // );
-        });
-    });
-
-    resizeObserver.observe(document.querySelector('body'));
   }
 
   closeCollectDataQuestion(data) {
@@ -366,14 +379,17 @@ class Content {
     );
 
     chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-      console.log(request.type);
       if (request.type === 'fillAllForm') {
         this.createProgressSection();
         this.autoFill();
+
+        sendResponse({
+          msg: 'handleButtonClick started!',
+        });
       }
 
       if (request.type === 'getClickedEl') {
-        this.createLoading();
+        this.createLoading(input);
         this.handleButtonClick({ input, label }, { target: null });
 
         sendResponse({
@@ -385,7 +401,6 @@ class Content {
 
   listenFormData() {
     chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-      console.log('request', request);
       if (request.type === 'getFormData') {
         const { data } = request;
         this.createCollectDataQuestion(data);
@@ -397,9 +412,21 @@ class Content {
     });
   }
 
-  createLoading() {
+  createLoading(input) {
+    const { left, height, width } = input.getBoundingClientRect();
+    const top = this.findPos(input);
+    input.classList.add('jaf-extension-focus');
+
     const div = document.createElement('div');
+    div.setAttribute('input-id', input.id || input.name);
     div.setAttribute('class', 'jaf-extension-loading');
+    div.setAttribute(
+      'style',
+      `
+        top: ${top + +height / 2}px;
+        left: ${left + width}px;
+      `
+    );
     div.innerHTML = `
       <div class="jaf-extension-button-loader">
         <div class="jaf-extension-button-loader__blob"></div>
@@ -412,9 +439,9 @@ class Content {
   }
 
   init({ showIcon }) {
-    this.connectAndSyncWithStorage();
+    console.log('showIcon@init', showIcon);
     this.render({ showIcon });
-    this.resizeObserver();
+    this.connectAndSyncWithStorage();
   }
 }
 

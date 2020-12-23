@@ -10,7 +10,6 @@ window.onload = () => {
   };
 
   const getSettingsFromStorage = (settings) => {
-    console.log('settings@content/index');
     showIcon = (settings && settings.showIcon) || false;
   };
 
@@ -26,12 +25,10 @@ window.onload = () => {
   };
 
   const render = ({ showIcon }) => {
-    console.log('render@Content');
     if (userIsExist) Content.init({ showIcon });
   };
 
   const initialRender = () => {
-    console.log('initial render@Content');
     Content.listenContextMenu();
     Content.listenFormData();
     getDetails();
@@ -39,13 +36,17 @@ window.onload = () => {
     chrome.storage.onChanged.addListener(function (changes, namespace) {
       Object.keys(changes).forEach((key) => {
         if (key === 'settings') {
-          render({ showIcon: changes[key].newValue.showIcon });
+          console.log(changes[key]);
+          render({
+            showIcon: changes[key].newValue.showIcon,
+          });
         }
       });
     });
   };
 
   initialRender();
+
   setTimeout(() => {
     render({ showIcon });
   }, 1000);

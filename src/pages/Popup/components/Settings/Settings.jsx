@@ -24,35 +24,39 @@ const Settings = () => {
     {
       label: 'Temperature',
       type: 'range',
-      max: "10",
-      min: "0"
+      max: "1",
+      min: "0",
+      step: "0.1"
     },
     {
       label: 'Frequency Penalty',
       type: 'range',
-      max: "10",
-      min: "0"
+      max: "1",
+      min: "0",
+      step: "0.1"
     },
     {
       label: 'Presence Penalty',
       type: 'range',
-      max: "10",
-      min: "0"
+      max: "1",
+      min: "0",
+      step: "0.1"
     },
     {
       label: 'Best of',
       type: 'range',
-      max: "10",
-      min: "0"
+      max: "20",
+      min: "1",
+      step: "1"
     },
   ];
   const [values, setValues] = useState({
     engine: 'davinci',
-    responseLength: '200',
-    temperature: '4',
-    frequencyPenalty: '0',
-    presencePenalty: '0',
-    bestOf: '10'
+    length: '200',
+    temperature: '0.6',
+    frequency_penalty: '0.2',
+    presence_penalty: '0.4',
+    best_of: '1'
   });
 
   const handleBack = () => {
