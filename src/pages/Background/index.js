@@ -69,7 +69,7 @@ class Background {
       engine: 'davinci',
       // context: 'Q: Who discovered the America?',
       stream: false,
-      stop: '/n',
+      stop: 'Q:',
       length: 400,
       best_of: 1,
       completions: 1,

@@ -20,18 +20,15 @@ class Content {
     this.isWebSiteDisabled = false;
   }
 
-  findPos(node) {
-    let curtop = 0;
-    let curtopscroll = 0;
-
-    if (node.offsetParent) {
-      do {
-        curtop += node.offsetTop;
-        curtopscroll += node.offsetParent ? node.offsetParent.scrollTop : 0;
-      } while ((node = node.offsetParent));
-
-      return curtop - curtopscroll;
+  findPos(el) {
+    let _x = 0;
+    let _y = 0;
+    while (el && !isNaN(el.offsetLeft) && !isNaN(el.offsetTop)) {
+      _x += el.offsetLeft - el.scrollLeft;
+      _y += el.offsetTop - el.scrollTop;
+      el = el.offsetParent;
     }
+    return { top: _y, left: _x };
   }
 
   getStorageData(key, arr) {
@@ -86,14 +83,13 @@ class Content {
 
     input.classList.remove('jaf-extension-focus');
 
-    if (input.parentNode.querySelector('.jaf-extension-button'))
-      input.parentNode
-        .querySelector('.jaf-extension-button')
-        .classList.remove('has-loading');
+    if (input.parentNode.querySelector('.jaf-extension-button')) {
+      const btn = input.parentNode.querySelector('.jaf-extension-button');
+      btn.classList.remove('has-loading');
+    }
   }
 
   fillElements({ input, answer }) {
-    debugger;
     const funcs = {
       TEXTAREA: () => (input.innerText = answer),
       INPUT: () => input.setAttribute('value', answer),
@@ -183,8 +179,10 @@ class Content {
     });
   }
 
-  createExtensionLogo({ top, left, width, height, input, label }) {
+  createExtensionLogo({ input, label }) {
     const button = document.createElement('button');
+    const { width, height } = input.getBoundingClientRect();
+
     button.setAttribute('type', 'button');
     button.setAttribute('class', 'jaf-extension-button');
     button.innerHTML = `
@@ -203,12 +201,13 @@ class Content {
       'click',
       this.handleButtonClick.bind(this, { input, label })
     );
-    // button.setAttribute(
-    //   'style',
-    //   `
-    //   top: ${height / 2}px;
-    // `
-    // );
+    button.setAttribute(
+      'style',
+      `
+        top: ${height / 2}px;
+        left: ${width - 8}px;
+      `
+    );
 
     return button;
   }
@@ -413,8 +412,8 @@ class Content {
   }
 
   createLoading(input) {
-    const { left, height, width } = input.getBoundingClientRect();
-    const top = this.findPos(input);
+    const { height, width } = input.getBoundingClientRect();
+    const { top, left } = this.findPos(input);
     input.classList.add('jaf-extension-focus');
 
     const div = document.createElement('div');
@@ -438,10 +437,40 @@ class Content {
     document.body.appendChild(div);
   }
 
+  resizeObserver() {
+    const resizeObserver = new ResizeObserver(() => {
+      document
+        .querySelectorAll('.jaf-extension-loading')
+        .forEach((item, index) => {
+          const input1 = document.querySelector(
+            `*#${item.getAttribute('input-id')}`
+          );
+          const input2 = document.querySelector(
+            `*[name="${item.getAttribute('input-id')}"]`
+          );
+          const targetInput = input1 || input2;
+          if (!targetInput) return;
+          const { top, left } = this.findPos(targetInput);
+          const { height, width } = targetInput.getBoundingClientRect();
+
+          item.setAttribute(
+            'style',
+            `
+              top: ${top + height / 2}px;
+              left: ${left + width}px;
+            `
+          );
+        });
+    });
+
+    resizeObserver.observe(document.querySelector('body'));
+  }
+
   init({ showIcon }) {
     console.log('showIcon@init', showIcon);
-    this.render({ showIcon });
     this.connectAndSyncWithStorage();
+    this.render({ showIcon });
+    this.resizeObserver();
   }
 }
 
