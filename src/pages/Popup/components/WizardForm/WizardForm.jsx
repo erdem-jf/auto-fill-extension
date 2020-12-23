@@ -17,6 +17,7 @@ const WizardForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    console.log('hello');
 
     StorageHelper.save({ type: 'personal', data: [{ answer: value, question: 'bio', type: 'personal' }] });
     StorageHelper.set({ key: 'wizard', value: 'generic' });
@@ -33,7 +34,7 @@ const WizardForm = () => {
           <textarea name="bio" id="bio" onChange={saveValue} />
         </div>
         <section>
-          <button type="button">Continue without save</button>
+          <button type="button" onClick={handleSubmit}>Continue without save</button>
           <button type="submit">Save</button>
         </section>
       </form>

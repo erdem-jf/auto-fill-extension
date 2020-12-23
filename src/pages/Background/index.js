@@ -41,7 +41,6 @@ class Background {
   async completions({ prompt, settings }) {
     const newSettings = this.settingsStringToNumber(settings);
     const { showIcon, length, ...rest } = newSettings;
-    console.log('rest', rest);
 
     const options = {
       engine: 'davinci',
@@ -56,6 +55,8 @@ class Background {
       ...rest,
     };
 
+    console.log('prompt', prompt);
+
     const result = await RequestHelper.completions(options);
 
     return result;
@@ -63,7 +64,6 @@ class Background {
 
   async generate({ context, settings }) {
     const { showIcon, ...rest } = this.settingsStringToNumber(settings);
-    console.log('newSettings', rest);
 
     const options = {
       engine: 'davinci',

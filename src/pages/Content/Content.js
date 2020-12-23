@@ -92,7 +92,7 @@ class Content {
   fillElements({ input, answer }) {
     const funcs = {
       TEXTAREA: () => (input.innerText = answer),
-      INPUT: () => input.setAttribute('value', answer),
+      INPUT: () => (input.value = answer),
     };
 
     funcs[input.nodeName] && funcs[input.nodeName]();
@@ -213,7 +213,6 @@ class Content {
   }
 
   render({ showIcon }) {
-    console.log('showIcon', showIcon);
     if (!showIcon) {
       this.removeAllButtons();
       return;
@@ -224,7 +223,9 @@ class Content {
 
       if (
         input.nodeName === 'INPUT' &&
-        ['file', 'tel'].includes(input.getAttribute('type'))
+        ['file', 'tel', 'radio', 'checkbox'].includes(
+          input.getAttribute('type')
+        )
       )
         return;
 
@@ -467,7 +468,6 @@ class Content {
   }
 
   init({ showIcon }) {
-    console.log('showIcon@init', showIcon);
     this.connectAndSyncWithStorage();
     this.render({ showIcon });
     this.resizeObserver();

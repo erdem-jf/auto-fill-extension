@@ -36,7 +36,6 @@ window.onload = () => {
     chrome.storage.onChanged.addListener(function (changes, namespace) {
       Object.keys(changes).forEach((key) => {
         if (key === 'settings') {
-          console.log(changes[key]);
           render({
             showIcon: changes[key].newValue.showIcon,
           });
