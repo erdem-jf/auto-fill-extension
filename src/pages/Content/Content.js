@@ -69,10 +69,13 @@ class Content {
     if (arr) {
       let string = '';
 
-      arr.forEach((item) => {
-        const result = `Q: ${item.question} A: ${item.answer} `;
-        string += result;
-      });
+      arr.forEach &&
+        arr.forEach((item) => {
+          const result = `Q: ${item.question} A: ${item.answer} `;
+          string += result;
+        });
+
+      string = arr;
 
       this.data[key] = string;
     }
@@ -80,7 +83,8 @@ class Content {
 
   connectAndSyncWithStorage() {
     try {
-      ['personal'].forEach((key) => {
+      console.log('connectAndSyncWithStorage WORKS!');
+      ['personal', 'business', 'incognito', 'targetDataSet'].forEach((key) => {
         StorageHelper.get({
           key,
           callback: this.getStorageData.bind(this, key),
@@ -160,63 +164,83 @@ class Content {
 
   handleButtonClick({ input, label }, { target: buttonEl }) {
     try {
-      if (buttonEl) buttonEl.classList.add('has-loading');
+      StorageHelper.get({
+        key: 'targetDataSet',
+        callback: (targetDataSet) => {
+          StorageHelper.get({
+            key: targetDataSet || 'personal',
+            callback: (data) => {
+              if (buttonEl) buttonEl.classList.add('has-loading');
 
-      if (
-        input &&
-        input.getAttribute &&
-        input.getAttribute('class') &&
-        input.getAttribute('class').indexOf &&
-        input.getAttribute('class').indexOf('jaf-extension-focus') &&
-        input.getAttribute('class').indexOf('jaf-extension-focus') < 0 &&
-        !autoFillAction
-      )
-        input.classList.add('jaf-extension-focus');
+              if (
+                input &&
+                input.getAttribute &&
+                input.getAttribute('class') &&
+                input.getAttribute('class').indexOf &&
+                input.getAttribute('class').indexOf('jaf-extension-focus') &&
+                input.getAttribute('class').indexOf('jaf-extension-focus') <
+                  0 &&
+                !autoFillAction
+              )
+                input.classList.add('jaf-extension-focus');
 
-      chrome.runtime.sendMessage(
-        { type: 'CATEGORIZE_DATA', query: label.innerText },
-        (response) => {
-          const inputType = this.getInputType(response.data.data);
-          console.log('@INPUT_TYPE: ', inputType);
+              console.log('targetDataSet', targetDataSet);
+              console.log(data);
+              const promptData = data.reduce((payload, item) => {
+                let string = payload;
+                string += `Q: ${item.question} A: ${item.answer}`;
 
-          if (['personal', 'information', 'history'].includes(inputType)) {
-            chrome.runtime.sendMessage(
-              {
-                type: 'COMPLETION',
-                prompt: `${this.data.personal} Q: ${label.innerText}?`,
-              },
-              (response) => {
-                // console.log('response', response);
-                const answer = response.data.data.choices[0].text;
+                return string;
+              }, '');
 
-                this.fillElements({
-                  input,
-                  answer: answer.split('A:')[1] || '',
-                });
-                this.incrementRequestAutoFillIndex();
-              }
-            );
-          }
+              chrome.runtime.sendMessage(
+                { type: 'CATEGORIZE_DATA', query: label.innerText },
+                (response) => {
+                  const inputType = this.getInputType(response.data.data);
+                  console.log('@INPUT_TYPE: ', inputType);
 
-          if (['idea'].includes(inputType)) {
-            chrome.runtime.sendMessage(
-              {
-                type: 'GENERATE_DATA',
-                context: `${this.data.personal} Q: ${label.innerText}?`,
-              },
-              (response) => {
-                const textArr = response.data.data.data[0].text
-                  .join('')
-                  .split('A:');
+                  if (['personal', 'information'].includes(inputType)) {
+                    chrome.runtime.sendMessage(
+                      {
+                        type: 'COMPLETION',
+                        prompt: `${promptData} Q: ${label.innerText}?`,
+                      },
+                      (response) => {
+                        // console.log('response', response);
+                        const answer = response.data.data.choices[0].text;
 
-                const answer = textArr[textArr.length - 1] || '';
-                this.fillElements({ input, answer });
-                this.incrementRequestAutoFillIndex();
-              }
-            );
-          }
-        }
-      );
+                        this.fillElements({
+                          input,
+                          answer: answer.split('A:')[1] || '',
+                        });
+                        this.incrementRequestAutoFillIndex();
+                      }
+                    );
+                  }
+
+                  if (['idea', 'history'].includes(inputType)) {
+                    chrome.runtime.sendMessage(
+                      {
+                        type: 'GENERATE_DATA',
+                        context: `${promptData} Q: ${label.innerText}?`,
+                      },
+                      (response) => {
+                        const textArr = response.data.data.data[0].text
+                          .join('')
+                          .split('A:');
+
+                        const answer = textArr[textArr.length - 1] || '';
+                        this.fillElements({ input, answer });
+                        this.incrementRequestAutoFillIndex();
+                      }
+                    );
+                  }
+                }
+              );
+            },
+          });
+        },
+      });
     } catch (err) {
       this.removeLoadingStyleFromCurrentInput(input);
       console.error(err);
@@ -372,20 +396,6 @@ class Content {
 
   autoFill() {
     try {
-      // autoFillAction = true;
-
-      // const fillingLabel = document.getElementById('jaf-filling-label');
-      // const input = this.inputs[this.requests.autofill.index];
-      // if (!input) return;
-
-      // const label = this.findLabel(this.inputs[this.requests.autofill.index]);
-
-      // if (!label) return this.incrementRequestAutoFillIndex();
-
-      // if (fillingLabel) fillingLabel.innerText = label.innerText;
-
-      // this.handleButtonClick({ input, label }, { target: null });
-
       for (let i = 0; i < this.inputs.length; i++) {
         const fillingLabel = document.getElementById('jaf-filling-label');
         const input = this.inputs[i];
@@ -399,11 +409,6 @@ class Content {
 
         this.handleButtonClick({ input, label }, { target: null });
       }
-      // let index = 0;
-      // this.inputs.forEach((input, index) => {
-      //   input.classList.add('jaf-extension-transition');
-      //   input.classList.add('jaf-extension-focus');
-      // });
     } catch (err) {
       console.error(err);
     }
@@ -413,6 +418,9 @@ class Content {
     if (document.querySelector('.jaf-extension-progress')) {
       document.querySelector('.jaf-extension-progress').remove();
       autoFillIndex = 0;
+      chrome.runtime.sendMessage({ type: 'AUTOFILL_FINISHED' }, (response) => {
+        console.log(response);
+      });
     }
   }
 
@@ -471,6 +479,7 @@ class Content {
     );
 
     chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+      console.log('request', request);
       if (request.type === 'fillAllForm') {
         this.createProgressSection();
         this.autoFill();

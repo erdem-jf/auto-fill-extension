@@ -44,7 +44,7 @@ class Background {
     console.log('rest', rest);
 
     const options = {
-      engine: 'instruct-davinci-beta',
+      engine: 'davinci',
       prompt,
       max_tokens: 400,
       temperature: 0.4,
@@ -57,6 +57,7 @@ class Background {
     };
 
     const result = await RequestHelper.completions(options);
+    console.log('result', result);
 
     return result;
   }
@@ -66,7 +67,7 @@ class Background {
     console.log('rest', rest);
 
     const options = {
-      engine: 'instruct-davinci-beta',
+      engine: 'davinci',
       // context: 'Q: Who discovered the America?',
       stream: false,
       stop: ['Q:'],
@@ -82,6 +83,7 @@ class Background {
     };
 
     const result = await RequestHelper.generate(options);
+    console.log('result', result);
 
     return result;
   }

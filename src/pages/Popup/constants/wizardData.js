@@ -1,3 +1,3 @@
-const wizardData = ['personal', 'business', 'incongnito', 'new'];
+const wizardData = ['personal', 'business', 'incognito', 'new'];
 
 export default wizardData;

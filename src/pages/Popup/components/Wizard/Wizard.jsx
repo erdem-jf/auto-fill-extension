@@ -18,7 +18,7 @@ const Wizard = () => {
   }
 
   const handleLogout = () => {
-    ['user', 'personal', 'wizard', 'toggle', 'settings'].forEach(key => StorageHelper.remove(key));
+    ['user', 'personal', 'wizard', 'toggle', 'settings', 'buttonIsDisabled'].forEach(key => StorageHelper.remove(key));
     dispatch(removeUserData());
   }
 
@@ -40,7 +40,7 @@ const Wizard = () => {
         avatarUrl={state.user.avatarUrl}
         PodoImg={PodoImg}
         username={state.user.username}
-        email={state.user.account_type.split('/')[state.user.account_type.split('/').length - 1]}
+        email={state.user && state.user.account_type && state.user.account_type.split && state.user.account_type.split('/')[state.user.account_type.split('/').length - 1]}
         handleLogout={handleLogout}
         handleSettings={handleSettings}
       />

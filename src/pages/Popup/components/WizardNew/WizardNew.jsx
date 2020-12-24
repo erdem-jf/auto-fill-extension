@@ -8,11 +8,11 @@ const WizardNew = ({
   category
 }) => {
   const { dispatch, state } = useContext(MainContext);
+  const [id, setID] = useState(category);
   const [formData, setFormData] = useState([
     {
       question:'What is your email adress',
       answer: 'example@jotform.com',
-      id: category
     }
   ]);
 
@@ -55,11 +55,16 @@ const WizardNew = ({
     setFormData(newFormData);
   };
 
+  const handleCategoryChange = ({ target: { value } }) => {
+
+    setID(value);
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     dispatch(setLoading(true));
 
-    StorageHelper.save({ type: formData[0].id || category, data: formData });
+    StorageHelper.save({ type: id || category, data: formData });
 
     formData.forEach((item) => {
       dispatch(updatePersonalData([ item ]));
@@ -71,6 +76,17 @@ const WizardNew = ({
 
   return (
     <div className="jaf-popup-wizard-new">
+      <section>
+        <select value={id} onChange={handleCategoryChange}>
+          {
+            ['personal', 'business', 'incognito'].map((typeItem, typeIndex) => {
+              return (
+                <option value={typeItem}>{typeItem}</option>
+              )
+            })
+          }
+        </select>
+      </section>
       <form onSubmit={handleSubmit}>
         {
           formData.map((item, index) => {
@@ -83,8 +99,6 @@ const WizardNew = ({
                 <input type="text" name={item.id} id={item.id} aria-label={item.id} onChange={handleInputOnChange.bind(this, index, 'question')} value={formData[index].question} />
                 <h4>Answer</h4>
                 <input type="text" name={item.id} id={item.id} aria-label={item.id} onChange={handleInputOnChange.bind(this, index, 'answer')} value={formData[index].answer} />
-                {/* <h4>Type</h4>
-                <input type="text" name={item.id} id={item.id} aria-label={item.id} onChange={handleInputOnChange.bind(this, index, 'type')} value={formData[index].id} /> */}
               </div>
             );
           })

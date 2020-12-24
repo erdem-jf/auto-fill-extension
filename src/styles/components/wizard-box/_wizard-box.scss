@@ -8,20 +8,39 @@
   padding: .75em 1em;
   margin-bottom: 1em;
 
-  // h5 {
-  //   margin-bottom: .5em;
-  // }
-
   h3 {
     font-size: 2em;
   }
 
+  &.is-incognito {
+    border: 1px solid $label-color;
+    background-color: transparent;
+
+    &.is-selected {
+      background-color: $label-color;
+
+      h5 {
+        color: $dark-color;
+      }
+    }
+  }
+
   &.is-personal {
-    background-color: #8ac185;
+    border: 1px solid #8ac185;
+    background-color: transparent;
+
+    &.is-selected {
+      background-color: #8ac185;
+    }
   }
 
   &.is-business {
-    background-color: #7768d8;
+    border: 1px solid #7768d8;
+    background-color: transparent;
+
+    &.is-selected {
+      background-color: #7768d8;
+    }
   }
 
   &.is-new {

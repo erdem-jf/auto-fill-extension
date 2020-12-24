@@ -9,26 +9,37 @@ import wizardData from '../../constants/wizardData';
 const WizardGeneric = () => {
   const { dispatch, state } = useContext(MainContext);
   const [url, setUrl] = useState('');
+  const [btnIsDisabled, setBtnIsDisabled] = useState(false);
+  const [targetDataSet, setTargetDataSet] = useState('');
 
   const handleFillAllForm = () => {
-    console.log('fill the form');
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      setBtnIsDisabled(true);
+      StorageHelper.set({ key: 'buttonIsDisabled', value: true });
+
+      chrome.tabs.sendMessage(
+        tabs[0].id,
+        { type: 'fillAllForm' },
+        (response) => {
+          console.log('response received', response);
+        }
+      );
+    });
   }
 
-  const handlePersonalClick = () => {
-    dispatch(updateWizardScreen('personal'));
-  };
+  const handleTargetDataSet = (type) => {
+    StorageHelper.set({ key: 'targetDataSet', value: type });
+    setTargetDataSet(type);
+  }
 
   const handleNewButtonClick = () => {
     dispatch(updateWizardScreen('new'));
   };
 
   const onWizardBoxClick = (type) => {
-    const funcs = {
-      personal: handlePersonalClick,
-      new: handleNewButtonClick,
-    };
+    if (type === 'new') return handleNewButtonClick();
 
-    if (funcs[type]) return funcs[type]();
+    handleTargetDataSet(type);
   };
 
   const getTabDetails = (tab) => {
@@ -45,6 +56,23 @@ const WizardGeneric = () => {
 
   useEffect(() => {
     StorageHelper.getTab(getTabDetails);
+    StorageHelper.get({ key: 'buttonIsDisabled', callback: (val) => {
+      setBtnIsDisabled(typeof val === 'undefined' ? false : val);
+    }});
+
+    StorageHelper.get({ key: 'targetDataSet', callback: (val) => {
+      setTargetDataSet(typeof val === 'undefined' ? 'personal' : val);
+    }});
+
+    chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+      if (msg.type === 'AUTOFILL_FINISHED') {
+        setBtnIsDisabled(false);
+        StorageHelper.set({ key: 'buttonIsDisabled', value: false });
+        sendResponse('@popup');
+      }
+
+      return;
+    });
   }, []);
 
   return (
@@ -55,7 +83,7 @@ const WizardGeneric = () => {
             return (
               <WizardBox
                 key={index.toString()}
-                className={`jaf-popup-wizard-box is-${item}`}
+                className={`jaf-popup-wizard-box is-${item}${item === targetDataSet ? ' is-selected' : ''}`}
                 onClick={onWizardBoxClick.bind(this, item)}
                 type={item}
                 count={(state[item] && state[item].length && state[item].length) || 0}
@@ -121,7 +149,7 @@ const WizardGeneric = () => {
         </div>
       </div>
       <div className="jaf-popup-wizard-cta">
-        <button type="button" onClick={handleFillAllForm}>Fill Now</button>
+        <button type="button" onClick={handleFillAllForm} disabled={btnIsDisabled ? 'disabled' : ''}>Fill Now</button>
       </div>
     </div>
   )

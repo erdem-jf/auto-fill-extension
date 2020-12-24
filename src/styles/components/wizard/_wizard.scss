@@ -53,11 +53,20 @@
     margin-top: 1em;
 
     button {
+      $btn-color: #3eae3e;
       width: 100%;
       height: 3em;
-      background-color: green;
+      background-color: $btn-color;
       color: #fff;
       cursor: pointer;
+
+      &:hover {
+        background-color: darken($btn-color, 5%);
+      }
+
+      &[disabled] {
+        opacity: .4;
+      }
     }
   }
 }
