@@ -11,7 +11,7 @@ const WizardBox = ({ type, className, count, onClick }) => {
         type !== 'new' ? (
           <>
             <h5>{type.toUpperCase()}</h5>
-            <h3>{count}</h3>
+            {/* <h3>{count}</h3> */}
           </>
         ) : (
           <>

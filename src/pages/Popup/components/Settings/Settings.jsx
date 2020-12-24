@@ -12,8 +12,8 @@ const Settings = () => {
     {
       label: 'Engine',
       type: 'select',
-      value: 'davinci',
-      options: ['ada', 'curie', 'davinci']
+      value: 'instruct-davinci-beta',
+      options: ['ada', 'curie', 'davinci', 'instruct-curie-beta', 'instruct-davinci-beta']
     },
     {
       label: 'Response Length',
@@ -51,11 +51,11 @@ const Settings = () => {
     },
   ];
   const [values, setValues] = useState({
-    engine: 'davinci',
-    length: '200',
-    temperature: '0.6',
+    engine: 'instruct-davinci-beta',
+    length: '400',
+    temperature: '0.4',
     frequency_penalty: '0.2',
-    presence_penalty: '0.4',
+    presence_penalty: '0.2',
     best_of: '1'
   });
 

@@ -2,7 +2,7 @@ import React, {  useContext, useState } from 'react';
 import { string } from 'prop-types';
 import { MainContext } from '../../store';
 import StorageHelper from '../../helpers/storage.helper';
-import { setLoading, updateCollectedData, updatePersonalData ,updateWizardScreen } from '../../actions';
+import { setLoading, updatePersonalData ,updateWizardScreen } from '../../actions';
 
 const WizardNew = ({
   category
@@ -10,8 +10,8 @@ const WizardNew = ({
   const { dispatch, state } = useContext(MainContext);
   const [formData, setFormData] = useState([
     {
-      question: category === 'collected' ? 'What is the name of your first pet?' : 'What is your email adress',
-      answer: category === 'collected' ? 'Zeytin' : 'example@jotform.com',
+      question:'What is your email adress',
+      answer: 'example@jotform.com',
       id: category
     }
   ]);
@@ -59,13 +59,10 @@ const WizardNew = ({
     e.preventDefault();
     dispatch(setLoading(true));
 
-    console.log('formData', formData);
-
     StorageHelper.save({ type: formData[0].id || category, data: formData });
 
     formData.forEach((item) => {
-      const func = category === 'collected' ? updateCollectedData : updatePersonalData;
-      dispatch(func([ item ]));
+      dispatch(updatePersonalData([ item ]));
     });
 
     dispatch(setLoading(false));
@@ -118,7 +115,7 @@ WizardNew.propTypes = {
 };
 
 WizardNew.defaultProps = {
-  category: 'collected'
+  category: 'personal'
 };
 
 export default WizardNew;

@@ -1,5 +1,8 @@
 import StorageHelper from '../Popup/helpers/storage.helper';
 
+let autoFillAction = false;
+let autoFillIndex = 0;
+
 class Content {
   constructor() {
     this.textInputs = document.querySelectorAll('input:not([type="hidden"])');
@@ -14,10 +17,41 @@ class Content {
     this.categories = ['information', 'idea', 'personal', 'history'];
     this.data = {
       personal: '',
-      collected: '',
     };
 
     this.isWebSiteDisabled = false;
+
+    this.requests = {
+      autofill: {
+        index: 0,
+        func: () => this.autoFill(),
+      },
+    };
+
+    this.requestsProxy = new Proxy(this.requests, {
+      set: (target, key, value) => {
+        const obj = target;
+        obj[key] = {
+          ...obj[key],
+          ...value,
+        };
+
+        obj[key].func();
+
+        return true;
+      },
+    });
+  }
+
+  incrementRequestAutoFillIndex() {
+    if (
+      this.requestsProxy.autofill.index < this.inputs.length &&
+      autoFillAction
+    ) {
+      this.requestsProxy.autofill = {
+        index: this.requests.autofill.index + 1,
+      };
+    }
   }
 
   findPos(el) {
@@ -32,20 +66,6 @@ class Content {
   }
 
   getStorageData(key, arr) {
-    if (key === 'disabledList') {
-      arr &&
-        arr.forEach &&
-        arr.forEach((item) => {
-          const isExist = item.url === window.location.href;
-
-          if (isExist) this.isWebSiteDisabled = item.status;
-
-          return;
-        });
-
-      return;
-    }
-
     if (arr) {
       let string = '';
 
@@ -60,7 +80,7 @@ class Content {
 
   connectAndSyncWithStorage() {
     try {
-      ['personal', 'collected', 'disabledList'].forEach((key) => {
+      ['personal'].forEach((key) => {
         StorageHelper.get({
           key,
           callback: this.getStorageData.bind(this, key),
@@ -84,8 +104,10 @@ class Content {
     input.classList.remove('jaf-extension-focus');
 
     if (input.parentNode.querySelector('.jaf-extension-button')) {
-      const btn = input.parentNode.querySelector('.jaf-extension-button');
-      btn.classList.remove('has-loading');
+      const btns = input.parentNode.querySelectorAll('.jaf-extension-button');
+      for (var i = 0; i < btns.length; i++) {
+        btns[i].classList.remove('has-loading');
+      }
     }
   }
 
@@ -98,6 +120,24 @@ class Content {
     funcs[input.nodeName] && funcs[input.nodeName]();
 
     this.removeLoadingStyleFromCurrentInput(input);
+
+    if (document.querySelector('.jaf-extension-progress')) {
+      autoFillIndex++;
+
+      const filteredInputs = [...this.inputs].filter((item) => {
+        if (
+          item.nodeName === 'INPUT' &&
+          ['file', 'tel', 'radio', 'checkbox', 'date'].includes(
+            item.getAttribute('type')
+          )
+        )
+          return false;
+
+        return item;
+      });
+
+      if (autoFillIndex === filteredInputs.length) this.stopAutoFill();
+    }
   }
 
   getInputType(text) {
@@ -124,7 +164,12 @@ class Content {
 
       if (
         input &&
-        input.getAttribute('class').indexOf('jaf-extension-focus') < 0
+        input.getAttribute &&
+        input.getAttribute('class') &&
+        input.getAttribute('class').indexOf &&
+        input.getAttribute('class').indexOf('jaf-extension-focus') &&
+        input.getAttribute('class').indexOf('jaf-extension-focus') < 0 &&
+        !autoFillAction
       )
         input.classList.add('jaf-extension-focus');
 
@@ -141,10 +186,14 @@ class Content {
                 prompt: `${this.data.personal} Q: ${label.innerText}?`,
               },
               (response) => {
-                console.log('response', response);
+                // console.log('response', response);
                 const answer = response.data.data.choices[0].text;
 
-                this.fillElements({ input, answer: answer.split('A:')[1] });
+                this.fillElements({
+                  input,
+                  answer: answer.split('A:')[1] || '',
+                });
+                this.incrementRequestAutoFillIndex();
               }
             );
           }
@@ -153,15 +202,16 @@ class Content {
             chrome.runtime.sendMessage(
               {
                 type: 'GENERATE_DATA',
-                context: `${this.data.personal} Q: ${label.innerText}? A: `,
+                context: `${this.data.personal} Q: ${label.innerText}?`,
               },
               (response) => {
                 const textArr = response.data.data.data[0].text
                   .join('')
                   .split('A:');
 
-                const answer = textArr[textArr.length - 1];
+                const answer = textArr[textArr.length - 1] || '';
                 this.fillElements({ input, answer });
+                this.incrementRequestAutoFillIndex();
               }
             );
           }
@@ -177,6 +227,43 @@ class Content {
     document.querySelectorAll('.jaf-extension-button').forEach((button) => {
       if (button && button.remove) button.remove();
     });
+  }
+
+  findLabel(input) {
+    window.scrollTo(0, 0);
+
+    if (
+      input.nodeName === 'INPUT' &&
+      ['file', 'tel', 'radio', 'checkbox', 'date'].includes(
+        input.getAttribute('type')
+      )
+    )
+      return false;
+
+    const { id: inputId } = input;
+
+    let i = 0;
+    let parentEl = input;
+    let targetLabel;
+
+    while (i < 10) {
+      const el =
+        parentEl.parentNode.querySelector('label') ||
+        parentEl.parentNode.querySelector('div[role="heading"]');
+
+      if (el) {
+        targetLabel = el;
+        i = 10;
+      }
+
+      parentEl = parentEl.parentNode;
+      i++;
+    }
+
+    const label =
+      document.querySelector(`label[for="${inputId}"]`) || targetLabel;
+
+    return label;
   }
 
   createExtensionLogo({ input, label }) {
@@ -219,37 +306,7 @@ class Content {
     }
 
     this.inputs.forEach((input) => {
-      window.scrollTo(0, 0);
-
-      if (
-        input.nodeName === 'INPUT' &&
-        ['file', 'tel', 'radio', 'checkbox'].includes(
-          input.getAttribute('type')
-        )
-      )
-        return;
-
-      const { id: inputId } = input;
-      let i = 0;
-      let parentEl = input;
-      let targetLabel;
-
-      while (i < 10) {
-        const el =
-          parentEl.parentNode.querySelector('label') ||
-          parentEl.parentNode.querySelector('div[role="heading"]');
-
-        if (el) {
-          targetLabel = el;
-          i = 10;
-        }
-
-        parentEl = parentEl.parentNode;
-        i++;
-      }
-
-      const label =
-        document.querySelector(`label[for="${inputId}"]`) || targetLabel;
+      const label = this.findLabel(input);
       // if the target input has the label with same id
       if (!label) return;
 
@@ -286,7 +343,7 @@ class Content {
   }
 
   handleCollectDataQuestion(data) {
-    StorageHelper.save({ key: 'collected', data });
+    StorageHelper.save({ key: 'personal', data });
 
     document.querySelector('.jaf-question-collect').remove();
   }
@@ -314,19 +371,49 @@ class Content {
   }
 
   autoFill() {
-    this.inputs.forEach((input, index) => {
-      input.classList.add('jaf-extension-transition');
+    try {
+      // autoFillAction = true;
 
-      setTimeout(() => {
-        if (this.inputs[index - 1]) {
-          this.inputs[index - 1].classList.remove('jaf-extension-box-shadow');
-          this.inputs[index - 1].classList.remove('jaf-extension-transition');
-          this.fillElements({ input: this.inputs[index - 1], answer: 'Test' });
-        }
+      // const fillingLabel = document.getElementById('jaf-filling-label');
+      // const input = this.inputs[this.requests.autofill.index];
+      // if (!input) return;
 
-        input.classList.add('jaf-extension-box-shadow');
-      }, index * 1000);
-    });
+      // const label = this.findLabel(this.inputs[this.requests.autofill.index]);
+
+      // if (!label) return this.incrementRequestAutoFillIndex();
+
+      // if (fillingLabel) fillingLabel.innerText = label.innerText;
+
+      // this.handleButtonClick({ input, label }, { target: null });
+
+      for (let i = 0; i < this.inputs.length; i++) {
+        const fillingLabel = document.getElementById('jaf-filling-label');
+        const input = this.inputs[i];
+        if (!input) return;
+
+        const label = this.findLabel(this.inputs[i]);
+
+        if (!label) continue;
+
+        if (fillingLabel) fillingLabel.innerText = 'Filling';
+
+        this.handleButtonClick({ input, label }, { target: null });
+      }
+      // let index = 0;
+      // this.inputs.forEach((input, index) => {
+      //   input.classList.add('jaf-extension-transition');
+      //   input.classList.add('jaf-extension-focus');
+      // });
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  stopAutoFill() {
+    if (document.querySelector('.jaf-extension-progress')) {
+      document.querySelector('.jaf-extension-progress').remove();
+      autoFillIndex = 0;
+    }
   }
 
   createProgressSection() {
@@ -336,12 +423,17 @@ class Content {
     div.innerHTML = `
       <div class="jaf-extension-progress-message">
         <img src="https://www.jotform.com/wepay/assets/img/podo.png?v=1.0.0.0" alt="jotform-podo" />
-        <h4>Form is filling by JotForm AI</h4>
+        <h4>
+          <span id="jaf-filling-label">Full name</span>
+        </h4>
         <div class="jaf-extension-progress-bar-wrapper">
           <div class="jaf-extension-progress-bar"></div>
         </div>
+        <!-- <button id="jaf-stop-filling" type="button">Stop</button> -->
       </div>
     `;
+
+    // div.querySelector('button').addEventListener('click', this.stopAutoFill);
 
     document.body.appendChild(div);
   }

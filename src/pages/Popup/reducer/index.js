@@ -3,10 +3,8 @@ import {
   SAVE_USER_DATA,
   SET_LOADING,
   SAVE_SETTINGS,
-  UPDATE_COLLECTED_DATA,
   UPDATE_PERSONAL_DATA,
   UPDATE_WIZARD_SCEEN,
-  UPDATE_DISABLED_LIST,
 } from '../actions/types';
 
 function reducer(state, action) {
@@ -16,13 +14,11 @@ function reducer(state, action) {
         ...state,
         personal: [],
         user: {},
-        collected: [],
         wizard: {
           screen: 'bio',
         },
         forms: [],
         settings: {},
-        disabledList: [],
       };
     case SAVE_USER_DATA:
       return {
@@ -31,13 +27,6 @@ function reducer(state, action) {
           ...state.user,
           ...action.value,
         },
-      };
-    case UPDATE_COLLECTED_DATA:
-      const newCollectedData = [...state.collected, ...action.value];
-      //
-      return {
-        ...state,
-        collected: newCollectedData,
       };
     case UPDATE_PERSONAL_DATA:
       return {
@@ -64,11 +53,6 @@ function reducer(state, action) {
           ...(state.settings || {}),
           ...action.value,
         },
-      };
-    case UPDATE_DISABLED_LIST:
-      return {
-        ...state,
-        disabledList: action.value,
       };
     default:
       return state;

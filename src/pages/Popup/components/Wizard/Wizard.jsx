@@ -7,7 +7,6 @@ import WizardGeneric from '../WizardGeneric';
 import WizardNew from '../WizardNew';
 import Personal from '../Personal';
 import Settings from '../Settings';
-import CollectedView from '../CollectedView';
 import StorageHelper from '../../helpers/storage.helper';
 import PodoImg from '../../../../assets/img/podo.png';
 
@@ -19,7 +18,7 @@ const Wizard = () => {
   }
 
   const handleLogout = () => {
-    ['user', 'personal', 'collected', 'wizard', 'toggle', 'settings', 'disabledList'].forEach(key => StorageHelper.remove(key));
+    ['user', 'personal', 'wizard', 'toggle', 'settings'].forEach(key => StorageHelper.remove(key));
     dispatch(removeUserData());
   }
 
@@ -29,8 +28,7 @@ const Wizard = () => {
       generic: () => <WizardGeneric />,
       new: () => <WizardNew />,
       personal: () => <Personal />,
-      settings: () => <Settings />,
-      collected: () => <CollectedView />
+      settings: () => <Settings />
     }
 
     return components[state.wizard.screen] ? components[state.wizard.screen]() : null;
@@ -42,7 +40,7 @@ const Wizard = () => {
         avatarUrl={state.user.avatarUrl}
         PodoImg={PodoImg}
         username={state.user.username}
-        email={state.user.email}
+        email={state.user.account_type.split('/')[state.user.account_type.split('/').length - 1]}
         handleLogout={handleLogout}
         handleSettings={handleSettings}
       />

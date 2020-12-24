@@ -1,3 +1,3 @@
-const types = ['personal', 'collected'];
+const types = ['personal'];
 
 export default types;

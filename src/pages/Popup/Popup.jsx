@@ -3,11 +3,9 @@ import { MainContext } from './store';
 import Login from './components/Login';
 import Wizard from './components/Wizard';
 import LoadingBar from './components/LoadingBar';
-import { saveUserData, saveSettings, setLoading, updateCollectedData, updatePersonalData, updateWizardScreen } from './actions';
+import { saveUserData, saveSettings, setLoading, updateWizardScreen } from './actions';
 import RequestHelper from './helpers/request.helper';
 import StorageHelper from './helpers/storage.helper';
-
-import wizardData from './constants/wizardData';
 
 const Popup = () => {
   const { dispatch, state } = useContext(MainContext);
@@ -55,23 +53,6 @@ const Popup = () => {
     dispatch(saveSettings(settings));
   }
 
-  const getCount = (item, val) => {
-    if (!val) return;
-
-    const func = {
-      personal: () => dispatch(updatePersonalData(val)),
-      collected: () => dispatch(updateCollectedData(val)),
-    };
-
-    if (func[item]) func[item]();
-  }
-
-  const handleCount = () => {
-    wizardData.forEach(item => {
-      StorageHelper.get({ key: item, callback: getCount.bind(this, item) });
-    });
-  };
-
   const renderScreen = () => {
     const components = {
       loading: () => <div>Loading...</div>,
@@ -92,8 +73,6 @@ const Popup = () => {
     };
 
     ['user', 'personal', 'settings'].forEach((key) => StorageHelper.get({ key, callback: funcs[key] }));
-
-    handleCount();
   }, []);
 
   useEffect(() => {

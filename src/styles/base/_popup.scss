@@ -2,7 +2,7 @@
   color: $light-color;
 }
 
-body {
+html, body {
   width: 432px;
   height: auto;
   font-size: 16px;
@@ -15,6 +15,6 @@ body {
 
 .jaf-popup {
   position: relative;
-  height: 100%;
+  height: auto;
   background-color: $dark-color;
 }

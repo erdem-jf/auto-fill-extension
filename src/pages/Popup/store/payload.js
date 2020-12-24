@@ -6,10 +6,8 @@ const payload = {
     screen: 'bio',
     showIcon: false,
   },
-  disabledList: [],
   loading: false,
   personal: [],
-  collected: [],
   forms: [],
   settings: {},
 };

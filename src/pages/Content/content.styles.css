@@ -173,7 +173,7 @@
   z-index: 9999999;
   top: 0;
   left: 50%;
-  width: 400px;
+  width: 100%;
   height: auto;
   padding: 1rem 2rem;
   transform: translateX(-50%);
@@ -199,18 +199,39 @@
 
 .jaf-extension-progress-message h4 {
   font-weight: 400;
-  width: calc(100% - 5rem);
+  width: auto;
+}
+
+.jaf-extension-progress-message h4 #jaf-filling-label {
+  position: relative;
+  border-radius: 6px;
+  background-color: #333;
+  color: #fff;
+  padding: .5rem 1rem;
+}
+
+.jaf-extension-progress-message h4 #jaf-filling-label::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  transform: translateX(2px) translateY(-50%);
+  border-radius: 2px;
+  right: 100%;
+  width: 0px;
+  height: 0px;
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  border-right: 8px solid #333;
 }
 
 .jaf-extension-progress-bar-wrapper {
-  margin: 0 auto;
+  margin: 0 0 0 2rem;
   overflow: hidden;
   position: relative;
-  width: 400px;
+  flex: 1;
   height: 16px;
   background-color: #e4e4e4;
   border-radius: 10px;
-  margin-top: 16px;
 }
 
 .jaf-extension-progress-bar {
@@ -247,4 +268,18 @@
   transition: all linear .32s;
   box-shadow: 0px 0px 12px 0px rgba(219,147,4,1) !important;
   border-color: rgba(219,147,4,1) !important;
+}
+
+#jaf-stop-filling {
+  display: block;
+  border-radius: 4px;
+  color: #fff;
+  background-color: red;
+  padding: .75rem 1.25rem;
+  margin-left: 2rem;
+  border: 0;
+  outline: none;
+  color: #ede4e4;
+  font-size: 16px;
+  cursor: pointer;
 }

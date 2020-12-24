@@ -25,7 +25,7 @@ window.onload = () => {
   };
 
   const render = ({ showIcon }) => {
-    if (userIsExist) Content.init({ showIcon });
+    Content.init({ showIcon });
   };
 
   const initialRender = () => {
@@ -36,9 +36,12 @@ window.onload = () => {
     chrome.storage.onChanged.addListener(function (changes, namespace) {
       Object.keys(changes).forEach((key) => {
         if (key === 'settings') {
-          render({
-            showIcon: changes[key].newValue.showIcon,
-          });
+          console.log('changes[key]', changes[key]);
+          if (changes[key].newValue.hasOwnProperty('showIcon')) {
+            render({
+              showIcon: changes[key].newValue.showIcon,
+            });
+          }
         }
       });
     });

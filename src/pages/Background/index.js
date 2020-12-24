@@ -41,21 +41,20 @@ class Background {
   async completions({ prompt, settings }) {
     const newSettings = this.settingsStringToNumber(settings);
     const { showIcon, length, ...rest } = newSettings;
+    console.log('rest', rest);
 
     const options = {
-      engine: 'davinci',
+      engine: 'instruct-davinci-beta',
       prompt,
-      max_tokens: 200,
+      max_tokens: 400,
       temperature: 0.4,
-      frequency_penalty: 0.6,
+      frequency_penalty: 0.2,
       presence_penalty: 0.2,
       top_p: 1,
       stop: ['Q:'],
       best_of: 1,
       ...rest,
     };
-
-    console.log('prompt', prompt);
 
     const result = await RequestHelper.completions(options);
 
@@ -64,16 +63,17 @@ class Background {
 
   async generate({ context, settings }) {
     const { showIcon, ...rest } = this.settingsStringToNumber(settings);
+    console.log('rest', rest);
 
     const options = {
-      engine: 'davinci',
+      engine: 'instruct-davinci-beta',
       // context: 'Q: Who discovered the America?',
       stream: false,
-      stop: 'Q:',
+      stop: ['Q:'],
       length: 400,
       best_of: 1,
       completions: 1,
-      frequency_penalty: 0.6,
+      frequency_penalty: 0.2,
       presence_penalty: 0.2,
       temperature: 0.4,
       top_p: 1,
@@ -99,6 +99,7 @@ class Background {
 
           if (msg.type === 'GENERATE_DATA') {
             this.generate({ context: msg.context, settings }).then((res) => {
+              console.log('res', res);
               sendResponse(res);
             });
           }
@@ -108,6 +109,7 @@ class Background {
               prompt: msg.prompt,
               settings,
             }).then((res) => {
+              console.log('res', res);
               sendResponse(res);
             });
           }
