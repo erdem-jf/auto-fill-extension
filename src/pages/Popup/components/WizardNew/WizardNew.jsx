@@ -11,7 +11,7 @@ const WizardNew = ({
   const [id, setID] = useState(category);
   const [formData, setFormData] = useState([
     {
-      question:'What is your email adress',
+      question:'Email address',
       answer: 'example@jotform.com',
     }
   ]);
@@ -64,9 +64,21 @@ const WizardNew = ({
     e.preventDefault();
     dispatch(setLoading(true));
 
-    StorageHelper.save({ type: id || category, data: formData });
+    const arr = formData.reduce((payload, item) => {
+      const result = [];
+      const obj = {};
 
-    formData.forEach((item) => {
+      const key = item.question.split(' ').join('_').toLocaleLowerCase();
+      obj[key] = item.answer;
+
+      result.push(obj);
+
+      return result;
+    }, []);
+
+    StorageHelper.save({ type: id || category, data: arr });
+
+    arr.forEach((item) => {
       dispatch(updatePersonalData([ item ]));
     });
 
@@ -129,7 +141,7 @@ WizardNew.propTypes = {
 };
 
 WizardNew.defaultProps = {
-  category: 'personal'
+  category: 'business'
 };
 
 export default WizardNew;

@@ -4,9 +4,9 @@ import StorageHelper from './storage.helper';
 
 function RequestHelper() {
   this.appKey = '';
-  this.loginUrl = 'https://api.jotform.com/user/login';
-  // this.loginUrl = 'https://erdem.jotform.pro/API/user/login';
-  this.logoutUrl = 'https://api.jotform.com/user/logout';
+  // this.loginUrl = 'https://api.jotform.com/user/login';
+  this.loginUrl = 'https://erdem.jotform.pro/API/user/login';
+  this.logoutUrl = 'https://erdem.jotform.pro/API/user/logout';
   this.userUrl = `https://erdem.jotform.pro/API/user?apiKey=${this.appKey}`;
   this.completionUrl = 'http://erdem.jotform.pro:21105/ai/completions';
   this.searchUrl = 'http://erdem.jotform.pro:21105/ai/search';

@@ -45,8 +45,8 @@ const Popup = () => {
   }
 
   const saveWizardDetails = (val) => {
-    const isBioExist = (val && val.find(item => item.question === 'bio')) || false;
-    dispatch(updateWizardScreen(isBioExist ? 'generic' : 'bio'));
+    const isPersonalExist = val || false;
+    dispatch(updateWizardScreen(isPersonalExist ? 'generic' : 'bio'));
   }
 
   const saveSettingsDetails = (settings) => {

@@ -50,6 +50,11 @@ window.onload = () => {
   initialRender();
 
   setTimeout(() => {
-    render({ showIcon });
+    StorageHelper.get({
+      key: 'settings',
+      callback: (settings) => {
+        render({ showIcon: !!settings.showIcon });
+      },
+    });
   }, 1000);
 };

@@ -1,3 +1,4 @@
+import stringSimilarity from 'string-similarity';
 import StorageHelper from '../Popup/helpers/storage.helper';
 
 let autoFillAction = false;
@@ -184,14 +185,42 @@ class Content {
               )
                 input.classList.add('jaf-extension-focus');
 
-              console.log('targetDataSet', targetDataSet);
-              console.log(data);
               const promptData = data.reduce((payload, item) => {
                 let string = payload;
-                string += `Q: ${item.question} A: ${item.answer}`;
+                console.log('item', item);
+                string += `Q: ${Object.keys(item)[0]} A: ${
+                  item[Object.keys(item)[0]]
+                }`;
 
                 return string;
               }, '');
+
+              let smilarScore = 0;
+              let smilarKey = '';
+
+              data.forEach((dataItem) => {
+                const score = stringSimilarity.compareTwoStrings(
+                  String(Object.keys(dataItem)[0]) || '',
+                  label.innerText.split(' ').join('_').toLowerCase()
+                );
+
+                if (score > smilarScore) {
+                  smilarScore = score;
+                  smilarKey = Object.keys(dataItem)[0];
+                }
+              });
+
+              if (smilarScore > 0.52) {
+                const answer = data.filter(
+                  (item) => Object.keys(item)[0] === smilarKey
+                )[0][smilarKey];
+
+                this.fillElements({ input, answer });
+                this.incrementRequestAutoFillIndex();
+                return;
+              }
+
+              console.log('promptData', promptData);
 
               chrome.runtime.sendMessage(
                 { type: 'CATEGORIZE_DATA', query: label.innerText },
@@ -272,8 +301,10 @@ class Content {
 
     while (i < 10) {
       const el =
-        parentEl.parentNode.querySelector('label') ||
-        parentEl.parentNode.querySelector('div[role="heading"]');
+        parentEl.parentNode &&
+        parentEl.parentNode.querySelector &&
+        (parentEl.parentNode.querySelector('label') ||
+          parentEl.parentNode.querySelector('div[role="heading"]'));
 
       if (el) {
         targetLabel = el;
