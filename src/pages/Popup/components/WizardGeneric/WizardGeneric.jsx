@@ -159,7 +159,7 @@ const WizardGeneric = () => {
         </div>
       </div>
       <div className="jaf-popup-wizard-cta">
-        <button type="button" onClick={handleFillAllForm} disabled={btnIsDisabled ? 'disabled' : ''}>Fill Now</button>
+        <button type="button" onClick={handleFillAllForm}>Fill Now</button>
       </div>
     </div>
   )

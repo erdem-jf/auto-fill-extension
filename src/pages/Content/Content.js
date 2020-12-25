@@ -225,7 +225,7 @@ class Content {
                 }
               });
 
-              if (_autoFill && smilarScore > 0.52) {
+              if (_autoFill && smilarScore > 0.45) {
                 const answer = data.filter(
                   (item) => Object.keys(item)[0] === smilarKey
                 )[0][smilarKey];
@@ -234,6 +234,12 @@ class Content {
                 this.incrementRequestAutoFillIndex();
                 return;
               }
+
+              console.log(
+                'label',
+                label.innerText.split(' ').join('_').toLowerCase()
+              );
+              console.log('smilarScore', smilarScore);
 
               chrome.runtime.sendMessage(
                 { type: 'CATEGORIZE_DATA', query: label.innerText },
