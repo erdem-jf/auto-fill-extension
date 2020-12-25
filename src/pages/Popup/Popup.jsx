@@ -68,11 +68,11 @@ const Popup = () => {
   useEffect(() => {
     const funcs = {
       user: saveUserDetails,
-      personal: saveWizardDetails,
+      business: saveWizardDetails,
       settings: saveSettingsDetails
     };
 
-    ['user', 'personal', 'settings'].forEach((key) => StorageHelper.get({ key, callback: funcs[key] }));
+    ['user', 'business', 'settings'].forEach((key) => StorageHelper.get({ key, callback: funcs[key] }));
   }, []);
 
   useEffect(() => {

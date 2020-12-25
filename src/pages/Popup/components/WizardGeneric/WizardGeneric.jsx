@@ -67,7 +67,7 @@ const WizardGeneric = () => {
     }});
 
     StorageHelper.get({ key: 'targetDataSet', callback: (val) => {
-      setTargetDataSet(typeof val === 'undefined' ? 'personal' : val);
+      setTargetDataSet(typeof val === 'undefined' ? 'business' : val);
     }});
 
     StorageHelper.get({ key: 'fastAutoFill', callback: (val) => {

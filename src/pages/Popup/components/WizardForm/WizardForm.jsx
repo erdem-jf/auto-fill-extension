@@ -30,11 +30,11 @@ const WizardForm = () => {
         });
       };
 
-      StorageHelper.save({ type: 'personal', data: arr });
+      StorageHelper.save({ type: 'business', data: arr });
       dispatch(updatePersonalData(arr));
     } else {
-      StorageHelper.save({ type: 'personal', data: [{ answer: value, question: 'bio', type: 'personal' }] });
-      dispatch(updatePersonalData([{ answer: value, question: 'bio', type: 'personal' }]));
+      StorageHelper.save({ type: 'business', data: [{ answer: value, question: 'bio', type: 'business' }] });
+      dispatch(updatePersonalData([{ answer: value, question: 'bio', type: 'business' }]));
     }
 
     StorageHelper.set({ key: 'wizard', value: 'generic' });

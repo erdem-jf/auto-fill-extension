@@ -35,7 +35,7 @@ function StorageHelper() {
     this.set({ key: obj.type, value: generatedData });
   };
 
-  this.save = ({ type = 'personal', data = [] }) => {
+  this.save = ({ type = 'business', data = [] }) => {
     try {
       this.get({
         key: type,

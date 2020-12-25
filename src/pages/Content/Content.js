@@ -184,7 +184,7 @@ class Content {
         key: 'targetDataSet',
         callback: (targetDataSet) => {
           StorageHelper.get({
-            key: targetDataSet || 'personal',
+            key: targetDataSet || 'business',
             callback: (data) => {
               if (buttonEl) buttonEl.classList.add('has-loading');
 
@@ -418,7 +418,7 @@ class Content {
   }
 
   handleCollectDataQuestion(data) {
-    StorageHelper.save({ key: 'personal', data });
+    StorageHelper.save({ key: 'business', data });
 
     document.querySelector('.jaf-question-collect').remove();
   }
@@ -427,7 +427,8 @@ class Content {
     const div = document.createElement('div');
     div.setAttribute('class', 'jaf-question-collect');
     div.innerHTML = `
-      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse semper mollis augue, ut gravida justo mollis at. Aenean maximus quam quis tempus pharetra. Pellentesque dapibus metus vel porttitor semper.</p>
+      <img src="https://www.jotform.com/wepay/assets/img/podo.png?v=1.0.0.0" alt="jotform-podo" />
+      <p>I have detected  new information for your "Business" tag, would you like me to categorize and save the information?</p>
       <button id="close">Close</button>
       <button id="save">Save</button>
     `;

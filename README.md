@@ -1,6 +1,6 @@
 ## HackWeek@JF: 21-25/12/2020
 
-A react application to fill any forms automatically with JF account
+A react application to fill any forms automatically with JotForm account
 
 Note: This projects based on Popup extension. Path: src/pages/Popup
 
