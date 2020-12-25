@@ -1,6 +1,8 @@
 import Content from './Content';
 import StorageHelper from '../Popup/helpers/storage.helper';
 
+window.jaf = {};
+
 window.onload = () => {
   let userIsExist = false;
   let showIcon = false;
@@ -25,6 +27,7 @@ window.onload = () => {
   };
 
   const render = ({ showIcon }) => {
+    console.log('showIcon', showIcon);
     Content.init({ showIcon });
   };
 
@@ -43,8 +46,15 @@ window.onload = () => {
             });
           }
         }
+
+        if (key === 'fastAutoFill') {
+          console.log('HERE?@@@@@@@@');
+          Content.fastAutoFill = changes[key].newValue;
+        }
       });
     });
+
+    console.log('initialRender@@@');
   };
 
   initialRender();
@@ -53,7 +63,12 @@ window.onload = () => {
     StorageHelper.get({
       key: 'settings',
       callback: (settings) => {
-        render({ showIcon: !!settings.showIcon });
+        render({
+          showIcon:
+            typeof settings.showIcon === 'undefined'
+              ? false
+              : settings.showIcon,
+        });
       },
     });
   }, 1000);

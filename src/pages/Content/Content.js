@@ -3,6 +3,7 @@ import StorageHelper from '../Popup/helpers/storage.helper';
 
 let autoFillAction = false;
 let autoFillIndex = 0;
+let _autoFill = false;
 
 class Content {
   constructor() {
@@ -44,6 +45,10 @@ class Content {
     });
   }
 
+  set fastAutoFill(val) {
+    _autoFill = val;
+  }
+
   incrementRequestAutoFillIndex() {
     if (
       this.requestsProxy.autofill.index < this.inputs.length &&
@@ -67,6 +72,10 @@ class Content {
   }
 
   getStorageData(key, arr) {
+    if (key === 'fastAutoFill') {
+      _autoFill = !!arr;
+    }
+
     if (arr) {
       let string = '';
 
@@ -85,7 +94,13 @@ class Content {
   connectAndSyncWithStorage() {
     try {
       console.log('connectAndSyncWithStorage WORKS!');
-      ['personal', 'business', 'incognito', 'targetDataSet'].forEach((key) => {
+      [
+        'personal',
+        'business',
+        'incognito',
+        'targetDataSet',
+        'fastAutoFill',
+      ].forEach((key) => {
         StorageHelper.get({
           key,
           callback: this.getStorageData.bind(this, key),
@@ -187,7 +202,7 @@ class Content {
 
               const promptData = data.reduce((payload, item) => {
                 let string = payload;
-                console.log('item', item);
+
                 string += `Q: ${Object.keys(item)[0]} A: ${
                   item[Object.keys(item)[0]]
                 }`;
@@ -210,7 +225,7 @@ class Content {
                 }
               });
 
-              if (smilarScore > 0.52) {
+              if (_autoFill && smilarScore > 0.52) {
                 const answer = data.filter(
                   (item) => Object.keys(item)[0] === smilarKey
                 )[0][smilarKey];
@@ -219,8 +234,6 @@ class Content {
                 this.incrementRequestAutoFillIndex();
                 return;
               }
-
-              console.log('promptData', promptData);
 
               chrome.runtime.sendMessage(
                 { type: 'CATEGORIZE_DATA', query: label.innerText },
@@ -355,6 +368,7 @@ class Content {
   }
 
   render({ showIcon }) {
+    console.log('showIcon', showIcon);
     if (!showIcon) {
       this.removeAllButtons();
       return;

@@ -123,14 +123,14 @@ class Background {
   }
 
   fillArea(info, tab) {
-    chrome.tabs.sendMessage(tab.id, { type: 'getClickedEl' }, ({ msg }) => {
-      console.log(msg);
+    chrome.tabs.sendMessage(tab.id, { type: 'getClickedEl' }, (res) => {
+      console.log(res);
     });
   }
 
   fillAllForm(info, tab) {
-    chrome.tabs.sendMessage(tab.id, { type: 'fillAllForm' }, ({ msg }) => {
-      console.log(msg);
+    chrome.tabs.sendMessage(tab.id, { type: 'fillAllForm' }, (res) => {
+      console.log(res);
     });
   }
 

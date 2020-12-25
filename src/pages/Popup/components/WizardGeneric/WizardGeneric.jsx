@@ -11,6 +11,7 @@ const WizardGeneric = () => {
   const [url, setUrl] = useState('');
   const [btnIsDisabled, setBtnIsDisabled] = useState(false);
   const [targetDataSet, setTargetDataSet] = useState('');
+  const [autoFill, setAutoFill] = useState(false);
 
   const handleFillAllForm = () => {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
@@ -25,6 +26,11 @@ const WizardGeneric = () => {
         }
       );
     });
+  }
+
+  const handleFastAutoFill = ({ target: { checked }}) => {
+    StorageHelper.set({ key: 'fastAutoFill', value: checked });
+    setAutoFill(checked);
   }
 
   const handleTargetDataSet = (type) => {
@@ -62,6 +68,10 @@ const WizardGeneric = () => {
 
     StorageHelper.get({ key: 'targetDataSet', callback: (val) => {
       setTargetDataSet(typeof val === 'undefined' ? 'personal' : val);
+    }});
+
+    StorageHelper.get({ key: 'fastAutoFill', callback: (val) => {
+      setAutoFill(typeof val === 'undefined' ? false : val);
     }});
 
     chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
@@ -125,7 +135,7 @@ const WizardGeneric = () => {
             <h5>Fast Autofill</h5>
           </div>
           <label htmlFor="showIcon">
-            <input type="checkbox" name="showIcon" id="showIcon" />
+            <input type="checkbox" name="showIcon" id="showIcon" onChange={handleFastAutoFill} checked={autoFill} />
             <span />
           </label>
         </div>
